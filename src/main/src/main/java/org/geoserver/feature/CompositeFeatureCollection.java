@@ -25,6 +25,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * Wraps multiple feature collections into a single.
  *
+ * 复合要素
+ *
  * @author Justin Deoliveira, The Open Planning Project
  */
 public class CompositeFeatureCollection extends DataFeatureCollection {

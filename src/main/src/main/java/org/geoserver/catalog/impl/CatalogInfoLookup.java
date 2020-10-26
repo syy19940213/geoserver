@@ -34,8 +34,19 @@ import org.opengis.feature.type.Name;
 class CatalogInfoLookup<T extends CatalogInfo> {
     static final Logger LOGGER = Logging.getLogger(CatalogInfoLookup.class);
 
+    /**
+     * 外层map通过类 类型分类， 内层map为 id-类 的键值对
+     */
     ConcurrentHashMap<Class<T>, Map<String, T>> idMultiMap = new ConcurrentHashMap<>();
+
+    /**
+     * 外层map通过类 类型分类， 内层map为 Name-类 的键值对
+     */
     ConcurrentHashMap<Class<T>, Map<Name, T>> nameMultiMap = new ConcurrentHashMap<>();
+
+    /**
+     *     函数式接口，功能通过传入的类T  创建一个Name对象
+     */
     Function<T, Name> nameMapper;
     static final Predicate TRUE = x -> true;
 
@@ -65,12 +76,23 @@ class CatalogInfoLookup<T extends CatalogInfo> {
         return vcMap;
     }
 
+    /**
+     * 首先根据类分类，   然后存储入  名称-类   id-类  的两个map
+     * @param value
+     * @return
+     */
     public T add(T value) {
         if (Proxy.isProxyClass(value.getClass())) {
             ModificationProxy h = (ModificationProxy) Proxy.getInvocationHandler(value);
             value = (T) h.getProxyObject();
         }
         Map<Name, T> nameMap = getMapForValue(nameMultiMap, value);
+        /**
+         * 调用函数接口  DefaultCatalogFacade 中定义传入进来的
+         * 例如：  static final Function<ResourceInfo, Name> RESOURCE_NAME_MAPPER =
+         *             r -> new NameImpl(r.getNamespace().getId(), r.getName());
+         *      方法功能：是通过传入的类创建一个NameImpl 对象
+         */
         Name name = nameMapper.apply(value);
         nameMap.put(name, value);
         Map<String, T> idMap = getMapForValue(idMultiMap, value);

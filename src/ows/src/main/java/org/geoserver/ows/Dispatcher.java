@@ -217,6 +217,13 @@ public class Dispatcher extends AbstractController {
         request.setCharacterEncoding(charSet.name());
     }
 
+    /**
+     * 继承AbstractController，在sevlet请求进入时调用，为方法入口
+     * @param httpRequest
+     * @param httpResponse
+     * @return
+     * @throws Exception
+     */
     protected ModelAndView handleRequestInternal(
             HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws Exception {
         preprocessRequest(httpRequest);
@@ -874,6 +881,11 @@ public class Dispatcher extends AbstractController {
                                 .invokeDirect(operationName, parameters);
             } else {
                 Method operation = opDescriptor.getMethod();
+                /**
+                 * 通过反射调用具体的执行方法
+                 * serviceBean 为具体的执行方能发
+                 * parameters 为通过kvp解析器解析出来的具体的封装类集合
+                 */
                 result = operation.invoke(serviceBean, parameters);
             }
         } catch (Exception e) {
@@ -1534,6 +1546,17 @@ public class Dispatcher extends AbstractController {
         return kvp;
     }
 
+    /**
+     * 将Request即http请求过来数据
+     * 通过不同的KvpRequestReader 解析成相应的 request类
+     *
+     * 例如 wms.getMap 请求，通过GetMapKvpRequestReader 将请求中的信息封装成GetMapRequest
+     *          GetMapRequest 中即包含了从内存（CatalogInfoLookup 中的map 在GeoServerLoader 时加载）中读取  layers styles信息
+     * @param type
+     * @param request
+     * @return
+     * @throws Exception
+     */
     Object parseRequestKVP(Class type, Request request) throws Exception {
         KvpRequestReader kvpReader = findKvpRequestReader(type);
 

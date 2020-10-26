@@ -14,6 +14,8 @@ import org.geotools.util.Version;
  * <p>This class is intended to be subclassed. Subclasses need declare the key in which they parse,
  * and the type of object they parse into.
  *
+ * 子类需要声明被解析时的key和被解析成的objcet类型
+ *
  * <p>Instances need to be declared in a spring context like the following:
  *
  * <pre>

@@ -38,6 +38,12 @@ public class GeoServerLoaderProxy
         this.resourceLoader = resourceLoader;
     }
 
+    /**
+     * 通过spring Aware调用 创建resourceLoader
+     * 默认创建为DefaultGeoServerLoader
+     * @param applicationContext
+     * @throws BeansException
+     */
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.loader = lookupGeoServerLoader(applicationContext);
         loader.setApplicationContext(applicationContext);
@@ -51,6 +57,13 @@ public class GeoServerLoaderProxy
         return bean;
     }
 
+    /**
+     * spring的BeanPostProcessor   在bean创建时调用
+     * @param bean
+     * @param beanName
+     * @return
+     * @throws BeansException
+     */
     public Object postProcessBeforeInitialization(Object bean, String beanName)
             throws BeansException {
         if (loader != null) {

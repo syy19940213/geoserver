@@ -179,6 +179,8 @@ public class GetMap {
      */
     public WebMap run(final GetMapRequest request, WMSMapContent mapContent)
             throws ServiceException, IOException {
+
+        // 参数校验
         assertMandatory(request);
 
         final String outputFormat = request.getFormat();
