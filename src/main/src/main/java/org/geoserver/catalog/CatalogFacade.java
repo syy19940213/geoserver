@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.geoserver.catalog.event.CatalogModifyEvent;
 import org.geoserver.catalog.impl.DefaultCatalogFacade;
+import org.geoserver.catalog.rsmse.*;
+import org.geoserver.catalog.rsmse.impl.RsmseMapConfigImpl;
+import org.geoserver.catalog.rsmse.impl.RsmseSymbolInfoImpl;
 import org.geoserver.catalog.util.CloseableIterator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -729,4 +732,175 @@ public interface CatalogFacade {
             throw new RuntimeException(e);
         }
     }
+
+
+    /**
+     * 添加自定义样式
+     * @param rsmseStyleInfo
+     */
+    void add(RsmseStyleInfo rsmseStyleInfo);
+
+    void remove(RsmseStyleInfo rsmseStyleInfo);
+
+    /**
+     * 分页查找自定义样式
+     * @param name
+     * @param page
+     * @param size
+     * @return
+     */
+    List<RsmseStyleInfo> getRsmseStyleByName(String name, Integer page, Integer size);
+
+    /**
+     * 根据名称获取自定义样式
+     * @param name
+     * @return
+     */
+    RsmseStyleInfo getRsmseStyleByName(String name);
+
+    /**
+     * 根据id获取自定义样式
+     * @param id
+     * @return
+     */
+    RsmseStyleInfo getRsmseStyleById(String id);
+
+    /**
+     * 自定义数据源添加
+     * @param rsmseSourceInfo
+     */
+    void add(RsmseSourceInfo rsmseSourceInfo);
+
+    /**
+     * 根据name模糊匹配相关source
+     * @param name
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    List<RsmseSourceInfo> getRsmseSourceByName(String name, Integer page, Integer pageSize);
+
+    /**
+     * 根据id获取source信息
+     * @param id
+     * @return
+     */
+    RsmseSourceInfo getRsmseSourceById(String id);
+
+    /**
+     * 删除数据源信息
+     * @param rsmseSourceInfo
+     */
+    void remove(RsmseSourceInfo rsmseSourceInfo);
+
+    /**
+     * 添加符号信息
+     * @param rsmseSymbolInfo
+     */
+    void add(RsmseSymbolInfo rsmseSymbolInfo);
+
+    /**
+     * 根据id查找符号信息
+     * @param id
+     * @return
+     */
+    RsmseSymbolInfo getRsmseSymbolById(String id);
+
+    /**
+     * 根据name模糊匹配符号信息
+     * @param name
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    List<RsmseSymbolInfo> getRsmseSymbolByName(String name, Integer page, Integer pageSize);
+
+    /**
+     * 删除符号数据
+     * @param rsmseSymbolInfo
+     */
+    void remove(RsmseSymbolInfo rsmseSymbolInfo);
+
+    /**
+     * 根据名称获取数据源
+     * @param name
+     * @return
+     */
+    RsmseSourceInfo getRsmseSourceByName(String name);
+
+    /**
+     * 根据名称获取符号
+     * @param name
+     * @return
+     */
+    RsmseSymbolInfo getRsmseSymbolByName(String name);
+
+    /**
+     * 根据名称获取地图配置
+     * @param name
+     * @return
+     */
+    RsmseMapConfig getRsmseMapConfigByName(String name);
+
+
+    /**
+     * 根据名称模糊匹配 获取地图配置
+     * @param name
+     * @return
+     */
+    List<RsmseMapConfig> getRsmseMapConfigByName(String name,Integer page,Integer pageSize);
+
+    /**
+     * 添加地图配置
+     * @param rsmseMapConfig
+     */
+    void add(RsmseMapConfig rsmseMapConfig);
+
+    /**
+     * 根据id获取地图配置
+     * @param id
+     * @return
+     */
+    RsmseMapConfig getRsmseMapConfigById(String id);
+
+    /**
+     * 删除地图配置
+     * @param rsmseMapConfig
+     */
+    void remove(RsmseMapConfig rsmseMapConfig);
+
+    /**
+     * 根据名称获取切片信息
+     * @param name
+     * @return
+     */
+    RsmseTileRuleInfo getRsmseTileRuleByName(String name);
+
+    /**
+     * 根据id获取切片信息
+     * @param id
+     * @return
+     */
+    RsmseTileRuleInfo getRsmseTileRuleById(String id);
+
+    /**
+     * 添加切片规则
+     * @param rsmseTileRuleInfo
+     */
+    void add(RsmseTileRuleInfo rsmseTileRuleInfo);
+
+    /**
+     * 根据name模糊匹配切片规则
+     * @param name
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    List<RsmseTileRuleInfo> getRsmseTileRuleByName(String name, Integer page, Integer pageSize);
+
+    /**
+     * 删除切片规则
+     * @param rsmseTileRuleInfo
+     */
+    void remove(RsmseTileRuleInfo rsmseTileRuleInfo);
 }

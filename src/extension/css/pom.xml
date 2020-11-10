@@ -77,7 +77,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.test.search.classdir>true</maven.test.search.classdir>
+    <maven.test.styleSearchRequest.classdir>true</maven.test.styleSearchRequest.classdir>
   </properties>
   <build>
     <plugins>

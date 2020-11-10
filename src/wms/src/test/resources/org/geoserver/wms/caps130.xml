@@ -163,14 +163,14 @@
             <Keyword>features</Keyword>
             <Keyword>group_lyr_130</Keyword>
         </KeywordList>
-       <CRS>EPSG:4326</CRS>       
+       <CRS>EPSG:4326</CRS>
        <EX_GeographicBoundingBox>
            <westBoundLongitude>-10.0</westBoundLongitude>
            <eastBoundLongitude>10.0</eastBoundLongitude>
            <southBoundLatitude>-10.0</southBoundLatitude>
            <northBoundLatitude>10.0</northBoundLatitude>
-       </EX_GeographicBoundingBox>       
-       <BoundingBox minx="-10" miny="-10" maxx="10" maxy="10" CRS="EPSG:4326"/>       
+       </EX_GeographicBoundingBox>
+       <BoundingBox minx="-10" miny="-10" maxx="10" maxy="10" CRS="EPSG:4326"/>
        <Style>
            <Name>line_group</Name>
            <Title>A boring default style</Title>
@@ -179,7 +179,7 @@
            <Format>image/png</Format>
            <OnlineResource xlink:type="simple" xlink:href="http://mock.test.geoserver.org/ows?service=WMS&amp;amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=topp%3Aroads22" xmlns:xlink="http://www.w3.org/1999/xlink"/>
            </LegendURL>
-       </Style>       
+       </Style>
       </Layer>
       <Layer queryable="1" opaque="0">
         <Name>group_lyr_230</Name>
@@ -189,14 +189,14 @@
             <Keyword>features</Keyword>
             <Keyword>group_lyr_130</Keyword>
         </KeywordList>
-       <CRS>EPSG:4326</CRS>       
+       <CRS>EPSG:4326</CRS>
        <EX_GeographicBoundingBox>
            <westBoundLongitude>0.0</westBoundLongitude>
            <eastBoundLongitude>20.0</eastBoundLongitude>
            <southBoundLatitude>0.0</southBoundLatitude>
            <northBoundLatitude>20.0</northBoundLatitude>
-       </EX_GeographicBoundingBox>       
-       <BoundingBox minx="0" miny="0" maxx="20" maxy="20" CRS="EPSG:4326"/>       
+       </EX_GeographicBoundingBox>
+       <BoundingBox minx="0" miny="0" maxx="20" maxy="20" CRS="EPSG:4326"/>
        <Style>
            <Name>line_group2</Name>
            <Title>A boring default style</Title>
@@ -205,7 +205,7 @@
            <Format>image/png</Format>
            <OnlineResource xlink:type="simple" xlink:href="http://mock.test.geoserver.org/ows?service=WMS&amp;amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=topp%3Aroads22" xmlns:xlink="http://www.w3.org/1999/xlink"/>
            </LegendURL>
-       </Style>       
+       </Style>
       </Layer>
       <Layer queryable="1" opaque="0">
         <Name>legacy_group_lyr_130</Name>
@@ -215,15 +215,15 @@
             <Keyword>features</Keyword>
             <Keyword>legacy_group_lyr_130</Keyword>
         </KeywordList>
-       <CRS>EPSG:4326</CRS>       
+       <CRS>EPSG:4326</CRS>
        <EX_GeographicBoundingBox>
            <westBoundLongitude>0.0</westBoundLongitude>
            <eastBoundLongitude>20.0</eastBoundLongitude>
            <southBoundLatitude>0.0</southBoundLatitude>
            <northBoundLatitude>20.0</northBoundLatitude>
-       </EX_GeographicBoundingBox>       
+       </EX_GeographicBoundingBox>
        <BoundingBox minx="0" miny="0" maxx="20" maxy="20" CRS="EPSG:4326"/>
       </Layer>
-    </Layer>    
+    </Layer>
   </Capability>
 </WMS_Capabilities>

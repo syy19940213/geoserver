@@ -1,0 +1,90 @@
+﻿
+<!--
+ Copyright (C) 2014 - 2016 Open Source Geospatial Foundation. All rights reserved.
+ This code is licensed under the GPL 2.0 license, available at the root
+ application directory.
+ -->
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+    <bean class="org.geoserver.platform.ModuleStatusImpl">
+      <constructor-arg index="0" value="rsmse-web"/>
+      <constructor-arg index="1" value="Web Interface"/>
+    </bean>
+
+
+    <bean id="remseWebLoader" class="com.geoway.rsmse.RsmseWebStreamLoader">
+        <constructor-arg ref="resourceLoader"/>
+    </bean>
+
+    <!-- 配置服务 -->
+
+    <bean id="rsmseURLMapping"
+          class="org.geoserver.ows.OWSHandlerMapping">
+        <constructor-arg ref="catalog"/>
+        <property name="alwaysUseFullPath" value="true"/>
+        <property name="mappings">
+            <props>
+                <prop key="/rsmse">dispatcher</prop>
+                <prop key="/rsmse/*">dispatcher</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="webService" class="com.geoway.rsmse.WebServiceImpl">
+        <constructor-arg ref="catalog"/>
+    </bean>
+
+    <bean id="web-service" class="org.geoserver.platform.Service">
+        <constructor-arg index="0" value="web"/>
+        <constructor-arg index="1" ref="webService"/>
+        <constructor-arg index="2" value="1.3.0"/>
+        <constructor-arg index="3">
+            <list>
+                <value>addStyle</value>
+                <value>delStyle</value>
+                <value>getStyleList</value>
+                <value>getStyle</value>
+                <value>changeStyle</value>
+                <value>getSld</value>
+                <value>getSourceList</value>
+                <value>addSource</value>
+                <value>getSource</value>
+                <value>changeSource</value>
+                <value>delSource</value>
+                <value>getDirList</value>
+                <value>addSymbol</value>
+                <value>changeSymbol</value>
+                <value>getSymbolList</value>
+                <value>getSymbol</value>
+                <value>delSymbol</value>
+                <value>addMapConfig</value>
+                <value>delMapConfig</value>
+                <value>changeMapConfig</value>
+                <value>getMapConfig</value>
+                <value>getMapConfigList</value>
+                <value>addTileRule</value>
+                <value>delTileRule</value>
+                <value>changeTileRule</value>
+                <value>getTileRuleList</value>
+                <value>getTileRule</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+
+
+    <!-- 数据读取器 -->
+    <bean id="jsonResponse" class="com.geoway.rsmse.response.JSONResponse">
+        <constructor-arg index="0" ref="web-service"/>
+    </bean>
+
+    <bean id="searchRequestReader" class="com.geoway.rsmse.kvp.SearchRequestReader">
+    </bean>
+
+    <bean id="symbolSearchRequestReader" class="com.geoway.rsmse.kvp.SymbolSearchRequestReader">
+    </bean>
+
+
+
+</beans>

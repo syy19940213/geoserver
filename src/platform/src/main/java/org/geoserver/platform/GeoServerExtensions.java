@@ -52,10 +52,13 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
      * Caches the names of the beans for a particular type, so that the lookup (expensive) wont' be
      * needed. We cache names instead of beans because doing the latter we would break the
      * "singleton=false" directive of some beans
+     *
+     * <p>缓存存储 * class - beanName（所有类相关的bean名称）
      */
     static SoftValueHashMap<Class, String[]> extensionsCache =
             new SoftValueHashMap<Class, String[]>(40);
 
+    /** 缓存存储 bean名称 - bean实现 */
     static ConcurrentHashMap<String, Object> singletonBeanCache =
             new ConcurrentHashMap<String, Object>();
 
@@ -106,6 +109,8 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
     /**
      * Loads all extensions implementing or extending <code>extensionPoint</code>.
      *
+     * <p>获取相关类的实现和相关扩展类集合
+     *
      * @param extensionPoint The class or interface of the extensions.
      * @param context The context in which to perform the lookup.
      * @return A collection of the extensions, or an empty collection.
@@ -113,11 +118,14 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
     @SuppressWarnings("unchecked")
     public static final <T> List<T> extensions(
             Class<T> extensionPoint, ApplicationContext context) {
+        // 相关bean的名称
         Collection<String> names;
         names = extensionNames(extensionPoint, context);
 
         // lookup extension filters preventing recursion
+        // 获取过滤器
         List<ExtensionFilter> filters;
+        // 判断是否是ExtensionFilter的继承类
         if (ExtensionFilter.class.isAssignableFrom(extensionPoint)) {
             filters = Collections.emptyList();
         } else {
@@ -126,6 +134,8 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
 
         // look up all the beans
         List<T> result = new ArrayList<T>(names.size());
+
+        // 过滤相关bean
         for (String name : names) {
             Object bean = getBean(context, name);
             if (!excludeBean(name, bean, filters)) result.add((T) bean);
@@ -138,6 +148,7 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
             List<Object> secondary = new ArrayList<Object>();
             for (ExtensionProvider xp : extensions(ExtensionProvider.class, context)) {
                 try {
+                    // 判断传入类是否是相关provider的父类
                     if (extensionPoint.isAssignableFrom(xp.getExtensionPoint())) {
                         secondary.addAll(xp.getExtensions(extensionPoint));
                     }
@@ -145,6 +156,7 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
                     LOGGER.log(Level.WARNING, "Extension provider threw exception", e);
                 }
             }
+            // 过滤并将符合过滤条件的添加到结果集中
             filter(secondary, filters, result);
         }
 
@@ -172,9 +184,18 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
         return extensionNames(extensionPoint, context);
     }
 
+    /**
+     * 根据clas信息相关bean的名称
+     *
+     * @param extensionPoint
+     * @param context
+     * @param <T>
+     * @return
+     */
     public static <T> Collection<String> extensionNames(
             Class<T> extensionPoint, ApplicationContext context) {
         String[] names;
+        // 先从缓存中取看有没有相关bean名称
         if (GeoServerExtensions.context == context) {
             names = extensionsCache.get(extensionPoint);
         } else {
@@ -184,6 +205,7 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
             checkContext(context, extensionPoint.getSimpleName());
             if (context != null) {
                 try {
+                    // 从spring容器中取bean名称
                     names = context.getBeanNamesForType(extensionPoint);
                     if (names == null) {
                         names = new String[0];
@@ -206,10 +228,23 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
         return Arrays.asList(names);
     }
 
+    /**
+     * 获取bean信息
+     *
+     * @param context
+     * @param name
+     * @return
+     */
     private static Object getBean(ApplicationContext context, String name) {
+
+        // 从缓存中取
         Object bean = singletonBeanCache.get(name);
         if (bean == null && context != null) {
+
+            // 从spring中取
             bean = context.getBean(name);
+
+            // bean存在，且是单例
             if (bean != null && context.isSingleton(name)) {
                 singletonBeanCache.putIfAbsent(name, bean);
             }
@@ -262,6 +297,8 @@ public class GeoServerExtensions implements ApplicationContextAware, Application
 
     /**
      * Loads a single bean by its type.
+     *
+     * <p>根据type获取单个bean，如果这个bean超过数量 将会抛出异常
      *
      * <p>This method returns null if there is no such bean. An exception is thrown if multiple
      * beans of the specified type exist.

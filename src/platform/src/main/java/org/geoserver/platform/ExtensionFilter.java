@@ -9,6 +9,8 @@ package org.geoserver.platform;
  * Pluggable extension that can be used to filter out an extension point implementation before it
  * gets returned by {@link GeoServerExtensions#extensions(Class)}
  *
+ * <p>获取bean的时候根据条件进行过滤
+ *
  * @author Andrea Aime - OpenGeo
  */
 public interface ExtensionFilter {

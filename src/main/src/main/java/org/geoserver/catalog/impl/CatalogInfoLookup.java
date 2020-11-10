@@ -16,8 +16,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.CatalogInfo;
+import org.geoserver.catalog.LayerInfo;
 import org.geoserver.ows.util.OwsUtils;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.type.Name;
@@ -34,20 +38,15 @@ import org.opengis.feature.type.Name;
 class CatalogInfoLookup<T extends CatalogInfo> {
     static final Logger LOGGER = Logging.getLogger(CatalogInfoLookup.class);
 
-    /**
-     * 外层map通过类 类型分类， 内层map为 id-类 的键值对
-     */
+    /** 外层map通过类 类型分类， 内层map为 id-类 的键值对 */
     ConcurrentHashMap<Class<T>, Map<String, T>> idMultiMap = new ConcurrentHashMap<>();
 
-    /**
-     * 外层map通过类 类型分类， 内层map为 Name-类 的键值对
-     */
+    /** 外层map通过类 类型分类， 内层map为 Name-类 的键值对 */
     ConcurrentHashMap<Class<T>, Map<Name, T>> nameMultiMap = new ConcurrentHashMap<>();
 
-    /**
-     *     函数式接口，功能通过传入的类T  创建一个Name对象
-     */
+    /** 函数式接口，功能通过传入的类T 创建一个Name对象 */
     Function<T, Name> nameMapper;
+
     static final Predicate TRUE = x -> true;
 
     public CatalogInfoLookup(Function<T, Name> nameMapper) {
@@ -76,8 +75,10 @@ class CatalogInfoLookup<T extends CatalogInfo> {
         return vcMap;
     }
 
+
     /**
-     * 首先根据类分类，   然后存储入  名称-类   id-类  的两个map
+     * 首先根据类分类， 然后存储入 名称-类 id-类 的两个map
+     *
      * @param value
      * @return
      */
@@ -88,10 +89,9 @@ class CatalogInfoLookup<T extends CatalogInfo> {
         }
         Map<Name, T> nameMap = getMapForValue(nameMultiMap, value);
         /**
-         * 调用函数接口  DefaultCatalogFacade 中定义传入进来的
-         * 例如：  static final Function<ResourceInfo, Name> RESOURCE_NAME_MAPPER =
-         *             r -> new NameImpl(r.getNamespace().getId(), r.getName());
-         *      方法功能：是通过传入的类创建一个NameImpl 对象
+         * 调用函数接口 DefaultCatalogFacade 中定义传入进来的 例如： static final Function<ResourceInfo, Name>
+         * RESOURCE_NAME_MAPPER = r -> new NameImpl(r.getNamespace().getId(), r.getName());
+         * 方法功能：是通过传入的类创建一个NameImpl 对象
          */
         Name name = nameMapper.apply(value);
         nameMap.put(name, value);
@@ -245,5 +245,44 @@ class CatalogInfoLookup<T extends CatalogInfo> {
         }
 
         return this;
+    }
+
+    public Map<Name, T> getNameMap(Class<T> tClass)
+    {
+        for (Class<T> key : nameMultiMap.keySet()) {
+            if (tClass.isAssignableFrom(key)) {
+                return nameMultiMap.get(key);
+            }
+        }
+        return null;
+    }
+
+    public List<T> getPageByName(String name, Integer page, Integer size,Class<T> tClass)
+    {
+        List<T> result = new ArrayList<>();
+        Map<Name, T> nameMap = getNameMap(tClass);
+        if(nameMap == null)
+        {
+            return null;
+        }
+        if (StringUtils.isEmpty(name))
+        {
+            nameMap.forEach((k,v) -> result.add(v) );
+        }
+        else
+        {
+            nameMap.forEach((k,v) -> {
+                if (k.getLocalPart().startsWith(name))
+                {
+                    result.add(v);
+                }
+            });
+        }
+        int start = (page-1) * size;
+        int end = page * size;
+        end = end > result.size() ? result.size(): end;
+        return result.stream()
+                .collect(Collectors.toList())
+                .subList(start,end);
     }
 }

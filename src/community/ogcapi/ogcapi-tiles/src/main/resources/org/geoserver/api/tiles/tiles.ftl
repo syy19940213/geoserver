@@ -6,7 +6,7 @@ Formats available and url templates to access tiles:
 <ul>
 <#list model.links as link>
 <#if link.rel == 'item'>
-<li>${link.type}: <code>${link.href}</code></li> 
+<li>${link.type}: <code>${link.href}</code></li>
 </#if>
 </#list>
 </ul>
@@ -15,7 +15,7 @@ Tiles metadata available as:
 <ul>
 <#list model.links as link>
 <#if link.rel == 'describedBy'>
-<li>${link.type}: <code>${link.href}</code></li> 
+<li>${link.type}: <code>${link.href}</code></li>
 </#if>
 </#list>
 </ul>

@@ -22,6 +22,8 @@ import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.catalog.StoreInfo;
 import org.geoserver.catalog.StyleInfo;
 import org.geoserver.catalog.WorkspaceInfo;
+import org.geoserver.catalog.rsmse.RsmseSourceInfo;
+import org.geoserver.catalog.rsmse.RsmseStyleInfo;
 import org.geoserver.ows.util.OwsUtils;
 import org.geotools.util.logging.Logging;
 
@@ -205,4 +207,5 @@ public abstract class AbstractCatalogFacade implements CatalogFacade {
             OwsUtils.set(o, "id", o.getClass().getSimpleName() + "-" + uid);
         }
     }
+
 }

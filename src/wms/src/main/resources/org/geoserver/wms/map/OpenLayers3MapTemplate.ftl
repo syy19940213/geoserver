@@ -170,9 +170,9 @@
           <a>Styles:</a>
           <select id="imageFormatSelector" onchange="setStyle(value)">
             <option value="">Default</option>
-            <#list styles as style>          
-               <option value="${style}">${style}</option>  
-            </#list>   
+            <#list styles as style>
+               <option value="${style}">${style}</option>
+            </#list>
           </select>
         </li>
         <li>
@@ -259,7 +259,7 @@
           ratio: 1,
           url: '${baseUrl}/${servicePath}',
           params: {'FORMAT': format,
-                   'VERSION': '1.1.1',  
+                   'VERSION': '1.1.1',
              <#list parameters as param>
                 "${param.name?js_string}": '${param.value?js_string}',
              </#list>
@@ -270,7 +270,7 @@
         visible: false,
         source: new ol.source.TileWMS({
           url: '${baseUrl}/${servicePath}',
-          params: {'FORMAT': format, 
+          params: {'FORMAT': format,
                    'VERSION': '1.1.1',
                    tiled: true,
              <#list parameters as param>

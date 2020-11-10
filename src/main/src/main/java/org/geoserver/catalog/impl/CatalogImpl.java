@@ -19,6 +19,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.FilenameUtils;
 import org.geoserver.GeoServerConfigurationLock;
 import org.geoserver.catalog.Catalog;
@@ -70,6 +72,8 @@ import org.geoserver.catalog.event.impl.CatalogBeforeAddEventImpl;
 import org.geoserver.catalog.event.impl.CatalogModifyEventImpl;
 import org.geoserver.catalog.event.impl.CatalogPostModifyEventImpl;
 import org.geoserver.catalog.event.impl.CatalogRemoveEventImpl;
+import org.geoserver.catalog.rsmse.*;
+import org.geoserver.catalog.rsmse.impl.*;
 import org.geoserver.catalog.util.CloseableIterator;
 import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.ows.util.OwsUtils;
@@ -1884,6 +1888,36 @@ public class CatalogImpl implements Catalog {
         return style;
     }
 
+
+    protected RsmseStyleInfo resolve(RsmseStyleInfo style) {
+        ((RsmseStyleInfoImpl) style).setCatalog(this);
+        return style;
+    }
+
+
+    protected RsmseSourceInfo resolve(RsmseSourceInfo rsmseSourceInfo) {
+        ((RsmseSourceInfoImpl) rsmseSourceInfo).setCatalog(this);
+        return rsmseSourceInfo;
+    }
+
+    protected RsmseSymbolInfo resolve(RsmseSymbolInfo rsmseSourceInfo) {
+        ((RsmseSymbolInfoImpl) rsmseSourceInfo).setCatalog(this);
+        return rsmseSourceInfo;
+    }
+
+    protected RsmseMapConfig resolve(RsmseMapConfig rsmseSourceInfo) {
+        ((RsmseMapConfigImpl) rsmseSourceInfo).setCatalog(this);
+        return rsmseSourceInfo;
+    }
+
+
+    protected RsmseTileRuleInfo resolve(RsmseTileRuleInfo rsmseSourceInfo) {
+        ((RsmseTileRuleInfoImpl) rsmseSourceInfo).setCatalog(this);
+        return rsmseSourceInfo;
+    }
+
+
+
     protected MapInfo resolve(MapInfo map) {
         resolveCollections(map);
         return map;
@@ -2019,7 +2053,10 @@ public class CatalogImpl implements Catalog {
             resolve((StyleInfo) info);
         } else if (info instanceof WorkspaceInfo) {
             resolve((WorkspaceInfo) info);
-        } else {
+        } else if (info instanceof RsmseStyleInfo){
+            resolve((RsmseStyleInfo) info);
+        }
+        else {
             throw new IllegalArgumentException("Unknown resource type: " + info);
         }
     }
@@ -2083,5 +2120,198 @@ public class CatalogImpl implements Catalog {
     @Override
     public CatalogCapabilities getCatalogCapabilities() {
         return facade.getCatalogCapabilities();
+    }
+
+    @Override
+    public void add(RsmseStyleInfo rsmseStyleInfo)
+    {
+        resolve(rsmseStyleInfo);
+        facade.add(rsmseStyleInfo);
+        added(rsmseStyleInfo);
+    }
+
+    @Override
+    public void remove(RsmseStyleInfo rsmseStyleInfo)
+    {
+
+        synchronized (facade)
+        {
+            facade.remove(rsmseStyleInfo);
+        }
+        fireRemoved(rsmseStyleInfo);
+    }
+
+    @Override
+    public List<RsmseStyleInfo> getRsmseStyleByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseStyleByName(name,page,pageSize);
+    }
+
+    @Override
+    public RsmseStyleInfo getRsmseStyleByName(String name)
+    {
+        return facade.getRsmseStyleByName(name);
+    }
+
+    @Override
+    public RsmseStyleInfo getRsmseStyleById(String id)
+    {
+
+        return facade.getRsmseStyleById(id);
+    }
+
+    @Override
+    public void add(RsmseSourceInfo rsmseSourceInfo)
+    {
+        resolve(rsmseSourceInfo);
+        facade.add(rsmseSourceInfo);
+        added(rsmseSourceInfo);
+    }
+
+    @Override
+    public List<RsmseSourceInfo> getRsmseSourceByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseSourceByName(name,page,pageSize);
+    }
+
+    @Override
+    public RsmseSourceInfo getRsmseSourceById(String id)
+    {
+        return facade.getRsmseSourceById(id);
+    }
+
+    @Override
+    public void remove(RsmseSourceInfo rsmseSourceInfo)
+    {
+        synchronized (facade)
+        {
+            facade.remove(rsmseSourceInfo);
+        }
+        fireRemoved(rsmseSourceInfo);
+    }
+
+    @Override
+    public void add(RsmseSymbolInfo rsmseSymbolInfo)
+    {
+        resolve(rsmseSymbolInfo);
+        facade.add(rsmseSymbolInfo);
+        added(rsmseSymbolInfo);
+    }
+
+    @Override
+    public RsmseSymbolInfo getRsmseSymbolById(String id)
+    {
+        return facade.getRsmseSymbolById(id);
+    }
+
+    @Override
+    public List<RsmseSymbolInfo> getRsmseSymbolByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseSymbolByName(name,page,pageSize);
+    }
+
+    @Override
+    public List<RsmseSymbolInfo> getRsmseSymbolByName(Integer type, String name, Integer page, Integer pageSize)
+    {
+        List<RsmseSymbolInfo>  list = getRsmseSymbolByName(name,page,pageSize);
+
+        if (type == null)
+        {
+            return list;
+        }
+        return list.stream().filter(s -> s.getType().equals(type)).collect(Collectors.toList());
+    }
+
+    @Override
+    public void remove(RsmseSymbolInfo rsmseSymbolInfo)
+    {
+        synchronized (facade)
+        {
+            facade.remove(rsmseSymbolInfo);
+        }
+        fireRemoved(rsmseSymbolInfo);
+    }
+
+    @Override
+    public RsmseSourceInfo getRsmseSourceByName(String name)
+    {
+        return facade.getRsmseSourceByName(name);
+    }
+
+    @Override
+    public RsmseSymbolInfo getRsmseSymbolByName(String name)
+    {
+        return facade.getRsmseSymbolByName(name);
+    }
+
+    @Override
+    public RsmseMapConfig getRsmseMapConfigByName(String name)
+    {
+        return facade.getRsmseMapConfigByName(name);
+    }
+
+    @Override
+    public List<RsmseMapConfig> getRsmseMapConfigByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseMapConfigByName(name,page,pageSize);
+    }
+
+    @Override
+    public RsmseMapConfig getRsmseMapConfigById(String id)
+    {
+        return facade.getRsmseMapConfigById(id);
+    }
+
+    @Override
+    public void add(RsmseMapConfig rsmseMapConfig)
+    {
+        resolve(rsmseMapConfig);
+        facade.add(rsmseMapConfig);
+        added(rsmseMapConfig);
+    }
+
+    @Override
+    public void remove(RsmseMapConfig rsmseMapConfig)
+    {
+        synchronized (facade)
+        {
+            facade.remove(rsmseMapConfig);
+        }
+        fireRemoved(rsmseMapConfig);
+    }
+
+    @Override
+    public RsmseTileRuleInfo getRsmseTileRuleByName(String name)
+    {
+        return facade.getRsmseTileRuleByName(name);
+    }
+
+    @Override
+    public RsmseTileRuleInfo getRsmseTileRuleById(String id)
+    {
+        return facade.getRsmseTileRuleById(id);
+    }
+
+    @Override
+    public void add(RsmseTileRuleInfo rsmseTileRuleInfo)
+    {
+        resolve(rsmseTileRuleInfo);
+        facade.add(rsmseTileRuleInfo);
+        added(rsmseTileRuleInfo);
+    }
+
+    @Override
+    public void remove(RsmseTileRuleInfo rsmseTileRuleInfo)
+    {
+        synchronized (facade){
+            facade.remove(rsmseTileRuleInfo);
+        }
+        fireRemoved(rsmseTileRuleInfo);
+    }
+
+    @Override
+    public List<RsmseTileRuleInfo> getRsmseTileRuleByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseTileRuleByName(name,page,pageSize);
     }
 }

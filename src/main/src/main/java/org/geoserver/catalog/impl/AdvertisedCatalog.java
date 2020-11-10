@@ -19,6 +19,7 @@ import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.catalog.StoreInfo;
 import org.geoserver.catalog.StyleInfo;
 import org.geoserver.catalog.WorkspaceInfo;
+import org.geoserver.catalog.rsmse.RsmseStyleInfo;
 import org.geoserver.ows.Dispatcher;
 import org.geoserver.ows.Request;
 import org.geoserver.security.decorators.DecoratingLayerGroupInfo;
@@ -338,4 +339,7 @@ public class AdvertisedCatalog extends AbstractFilteredCatalog {
             delegate.save(layerGroup);
         }
     }
+
+
+
 }

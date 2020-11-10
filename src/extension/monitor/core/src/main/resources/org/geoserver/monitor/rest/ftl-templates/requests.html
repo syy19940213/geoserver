@@ -33,8 +33,8 @@
             <#else>
               <td>${v.properties.path}</td>
             </#if>
-            
-            <#if v.properties.queryString?length gte 50> 
+
+            <#if v.properties.queryString?length gte 50>
               <td title="${v.properties.queryString}">${v.properties.queryString?substring(0,50)}</td>
             <#else>
               <td>${v.properties.queryString}</td>

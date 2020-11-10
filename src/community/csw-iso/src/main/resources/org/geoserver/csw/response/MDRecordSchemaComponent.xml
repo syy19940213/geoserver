@@ -252,7 +252,7 @@
 	<!-- =========================================================================== -->
 	<xs:simpleType name="MD_TopicCategoryCode_Type">
 		<xs:annotation>
-			<xs:documentation>High-level geospatial data thematic classification to assist in the grouping and search of available geospatial datasets</xs:documentation>
+			<xs:documentation>High-level geospatial data thematic classification to assist in the grouping and styleSearchRequest of available geospatial datasets</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="farming"/>

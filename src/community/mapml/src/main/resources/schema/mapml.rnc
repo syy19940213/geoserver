@@ -1,8 +1,8 @@
 datatypes xsd = "http://www.w3.org/2001/XMLSchema-datatypes"
-start = mapml 
+start = mapml
 mapml = element mapml { head?,body }
 head = element head { headContent }
-link = element link { 
+link = element link {
         attribute href { xsd:anyURI }?,
         # can have a tref or an href, but not both
         attribute tref { text }?,
@@ -14,8 +14,8 @@ link = element link {
         attribute hreflang { text }?
     }
 links = link*
-headContent =  
-    element base { 
+headContent =
+    element base {
         attribute href {text}
     }? &
     element meta {
@@ -29,10 +29,10 @@ headContent =
     links
 
 body = element body { bodyContent }
-bodyContent =  extent? & links & (feature | tile | image)*  
+bodyContent =  extent? & links & (feature | tile | image)*
 extent = element extent {
   attribute units  { "OSMTILE" | "CBMTILE" | "APSTILE" | "WGS84" }?,
-  attribute action { xsd:anyURI }?, 
+  attribute action { xsd:anyURI }?,
   attribute method { "get" | "GET" }?,
   attribute enctype { "application/x-www-form-urlencoded" }?,
   (inputs* & datalist* & links* & select* & label*)?
@@ -47,7 +47,7 @@ inputs = (element input {
   attribute shard { text }?,
   attribute list { text }?,
   # position tokens are based on /composed from the set of keywords used for CSS object-position, but they are obviously unique tokesn and not combinable otherwise
-  # https://developer.mozilla.org/en-US/docs/Web/CSS/object-position 
+  # https://developer.mozilla.org/en-US/docs/Web/CSS/object-position
   attribute position { "top-left" | "top-right" | "bottom-left" | "bottom-right" | "center-left" | "center-right" | "top-center" | "bottom-center" | "center" }?,
   attribute axis { "latitude" | "longitude" | "easting" | "northing" | "x" | "y" | "row" | "column" | "i" | "j" }?,
   attribute units {"tilematrix" | "pcrs" | "tcrs" | "map" | "gcrs" | "tile" }?,
@@ -89,7 +89,7 @@ image =    element image { ImageModel }
 geometry = element geometry { GeometryContent }
 properties = element properties { PropertyContent }
 
-ImageResourceMetadataAttributes =  
+ImageResourceMetadataAttributes =
     attribute src { text },
     imageLocation?,
     imageSize?,
@@ -97,14 +97,14 @@ ImageResourceMetadataAttributes =
     attribute type { text }?
 ImageModel =  ImageResourceMetadataAttributes
 # allow any property/value via simple elements with allowed text content
-PropertyContent = any_attribute*, any_content 
+PropertyContent = any_attribute*, any_content
 any_content = any_element*
 any_element = element * { any_attribute*, text }
 any_attribute = attribute * { text }
 imageLocation = attribute x { xsd:double }, attribute y { xsd:double }
 imageSize = attribute width { xsd:integer },attribute height { xsd:integer }
 
-GeometryContent = point | linestring | polygon | multipoint | multilinestring | multipolygon | geometrycollection   
+GeometryContent = point | linestring | polygon | multipoint | multilinestring | multipolygon | geometrycollection
 point = element point { coordinatePair }
 linestring = element linestring { twoOrMoreCoordinatePairs }
 polygon = element polygon { threeOrMoreCoordinatePairs+ }
@@ -118,4 +118,4 @@ coordinatePair = element coordinates  { list  { (xsd:double, xsd:double) } }
 twoOrMoreCoordinatePairs = element coordinates { list { (xsd:double, xsd:double)+ } }
 threeOrMoreCoordinatePairs = element coordinates { list { (xsd:double, xsd:double), (xsd:double, xsd:double), (xsd:double, xsd:double)+ } }
 # for bbox content, omits coordinates element
-twoCoordinatePairs =  list  { (xsd:double, xsd:double, xsd:double, xsd:double) } 
+twoCoordinatePairs =  list  { (xsd:double, xsd:double, xsd:double, xsd:double) }

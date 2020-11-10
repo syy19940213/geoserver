@@ -16,15 +16,15 @@
   <xs:element name="Query" type="mstns:QueryType">
     <xs:annotation>
       <xs:documentation>
-        Defines a search query that can be performed by search clients. Please see
+        Defines a styleSearchRequest query that can be performed by styleSearchRequest clients. Please see
         the OpenSearch Query element
         specification for more information.
 
         OpenSearch description
         documents should include at least one Query element of role="example" that is
         expected to
-        return search results. Search clients may use this example query to validate
-        that the search
+        return styleSearchRequest results. Search clients may use this example query to validate
+        that the styleSearchRequest
         engine is working properly.
       </xs:documentation>
     </xs:annotation>
@@ -49,7 +49,7 @@
           <xs:element name="Description" minOccurs="1" maxOccurs="1">
             <xs:annotation>
               <xs:documentation>
-                Contains a human-readable text description of the search engine.
+                Contains a human-readable text description of the styleSearchRequest engine.
               </xs:documentation>
             </xs:annotation>
             <xs:simpleType>
@@ -61,13 +61,13 @@
           <xs:element name="Url" minOccurs="1" maxOccurs="unbounded">
             <xs:annotation>
               <xs:documentation>
-                Describes an interface by which a search client can make search
-                requests of the search engine.
+                Describes an interface by which a styleSearchRequest client can make styleSearchRequest
+                requests of the styleSearchRequest engine.
                 OpenSearch provides support for both index-based and
-                page-based search engines. By default, both the first search result and the first
+                page-based styleSearchRequest engines. By default, both the first styleSearchRequest result and the first
                 page
-                of search results are numbered "1". Search engines can use the "indexOffset" and
-                "pageOffset" attributes to inform search clients of different starting values.
+                of styleSearchRequest results are numbered "1". Search engines can use the "indexOffset" and
+                "pageOffset" attributes to inform styleSearchRequest clients of different starting values.
               </xs:documentation>
             </xs:annotation>
             <xs:complexType>
@@ -78,7 +78,7 @@
               <xs:attribute name="template" use="required">
                 <xs:annotation>
                   <xs:documentation>
-                    Contains the search URL template to be processed according to
+                    Contains the styleSearchRequest URL template to be processed according to
                     the
                     OpenSearch URL template syntax.
 
@@ -89,7 +89,7 @@
 
                 <xs:annotation>
                   <xs:documentation>
-                    Contains the MIME type of the search result format.
+                    Contains the MIME type of the styleSearchRequest result format.
                     Restrictions:
                     The value must be a valid MIME type.
                   </xs:documentation>
@@ -110,7 +110,7 @@
               <xs:attribute name="indexOffset" default="1" use="optional">
                 <xs:annotation>
                   <xs:documentation>
-                    Contains the index number of the first search result.
+                    Contains the index number of the first styleSearchRequest result.
                   </xs:documentation>
                 </xs:annotation>
                 <xs:simpleType>
@@ -121,7 +121,7 @@
 
                 <xs:annotation>
                   <xs:documentation>
-                    Contains the page number of the first set of search results.
+                    Contains the page number of the first set of styleSearchRequest results.
                   </xs:documentation>
                 </xs:annotation>
                 <xs:simpleType>
@@ -147,7 +147,7 @@
               <xs:documentation>
 
                 Contains a set of words that are used as keywords to identify and
-                categorize this search content. Tags must be a single word and are delimited by the
+                categorize this styleSearchRequest content. Tags must be a single word and are delimited by the
                 space character (' ').
                 Restriction: The value must not contain HTML or other markup.
               </xs:documentation>
@@ -163,7 +163,7 @@
             <xs:annotation>
               <xs:documentation>
                 Contains an extended human-readable title that identifies this
-                search
+                styleSearchRequest
                 engine.
 
                 Search clients should use the value of the ShortName element if this
@@ -185,13 +185,13 @@
               <xs:documentation>
 
                 Contains a URL that identifies the location of an image that can be
-                used in association with this search content.
+                used in association with this styleSearchRequest content.
 
                 Image sizes are offered as a hint to
                 the
-                search client. The search client will chose the most appropriate image for the
+                styleSearchRequest client. The styleSearchRequest client will chose the most appropriate image for the
                 available space and should give preference to those listed first in the OpenSearch
-                description document. Square aspect ratios are recommended. When possible, search
+                description document. Square aspect ratios are recommended. When possible, styleSearchRequest
                 engines should offer a 16x16 image of type "image/x-icon" or
                 "image/vnd.microsoft.icon" (the Microsoft ICON format) and a 64x64 image of type
                 "image/jpeg" or "image/png".
@@ -237,16 +237,16 @@
           <xs:element name="Query" type="mstns:QueryType" minOccurs="0">
             <xs:annotation>
               <xs:documentation>
-                Defines a search query that can be performed by search clients.
+                Defines a styleSearchRequest query that can be performed by styleSearchRequest clients.
                 Please
                 see the OpenSearch Query element specification for more information.
 
                 OpenSearch
                 description documents should include at least one Query element of
                 role="example" that
-                is expected to return search results. Search clients may use this
+                is expected to return styleSearchRequest results. Search clients may use this
                 example query to
-                validate that the search engine is working properly.
+                validate that the styleSearchRequest engine is working properly.
               </xs:documentation>
             </xs:annotation>
 
@@ -277,7 +277,7 @@
               <xs:documentation>
                 Contains a list of all sources or entities that should be credited
                 for
-                the content contained in the search feed.
+                the content contained in the styleSearchRequest feed.
                 Restrictions: The value must not contain
                 HTML
                 or other markup.
@@ -292,9 +292,9 @@
           <xs:element name="SyndicationRight" default="open" minOccurs="0" maxOccurs="1">
             <xs:annotation>
               <xs:documentation>
-                Contains a value that indicates the degree to which the search
+                Contains a value that indicates the degree to which the styleSearchRequest
                 results
-                provided by this search engine can be queried, displayed, and redistributed.
+                provided by this styleSearchRequest engine can be queried, displayed, and redistributed.
               </xs:documentation>
             </xs:annotation>
 
@@ -304,11 +304,11 @@
                 <xs:enumeration value="open">
                   <xs:annotation>
                     <xs:documentation>
-                      The search client may request search results.
-                      The search client
-                      may display the search results to end users.
-                      The search client may send the
-                      search results to other search clients.
+                      The styleSearchRequest client may request styleSearchRequest results.
+                      The styleSearchRequest client
+                      may display the styleSearchRequest results to end users.
+                      The styleSearchRequest client may send the
+                      styleSearchRequest results to other styleSearchRequest clients.
                     </xs:documentation>
 
                   </xs:annotation>
@@ -316,29 +316,29 @@
                 <xs:enumeration value="limited">
                   <xs:annotation>
                     <xs:documentation>
-                      The search client may request search results.
-                      The search client
-                      may display the search results to end users.
-                      The search client may not send the
-                      search results to other search clients.
+                      The styleSearchRequest client may request styleSearchRequest results.
+                      The styleSearchRequest client
+                      may display the styleSearchRequest results to end users.
+                      The styleSearchRequest client may not send the
+                      styleSearchRequest results to other styleSearchRequest clients.
                     </xs:documentation>
                   </xs:annotation>
                 </xs:enumeration>
                 <xs:enumeration value="private">
                   <xs:annotation>
                     <xs:documentation>
-                      The search client may request search results.
-                      The search client
-                      may not display the search results to end users.
-                      The search client may not send
-                      the search results to other search clients.
+                      The styleSearchRequest client may request styleSearchRequest results.
+                      The styleSearchRequest client
+                      may not display the styleSearchRequest results to end users.
+                      The styleSearchRequest client may not send
+                      the styleSearchRequest results to other styleSearchRequest clients.
                     </xs:documentation>
                   </xs:annotation>
                 </xs:enumeration>
                 <xs:enumeration value="closed">
                   <xs:annotation>
                     <xs:documentation>
-                      The search client may not request search results.
+                      The styleSearchRequest client may not request styleSearchRequest results.
                     </xs:documentation>
                   </xs:annotation>
                 </xs:enumeration>
@@ -351,13 +351,13 @@
           >
             <xs:annotation>
               <xs:documentation>
-                Contains a boolean value that should be set to true if the search
+                Contains a boolean value that should be set to true if the styleSearchRequest
                 results may contain material intended only for adults.
 
                 As there are no universally
-                applicable guidelines as to what constitutes "adult" content, the search engine
+                applicable guidelines as to what constitutes "adult" content, the styleSearchRequest engine
                 should
-                make a good faith effort to indicate when there is a possibility that search
+                make a good faith effort to indicate when there is a possibility that styleSearchRequest
                 results
                 may contain material inappropriate for all audiences.
                 The values "false",
@@ -372,25 +372,25 @@
           <xs:element type="xs:string" name="Language" minOccurs="0" default="*">
             <xs:annotation>
               <xs:documentation>
-                Contains a string that indicates that the search engine supports
-                search results in the specified language.
+                Contains a string that indicates that the styleSearchRequest engine supports
+                styleSearchRequest results in the specified language.
 
                 An OpenSearch description document should
-                include one "Language" element for each language that the search engine supports. If
-                the search engine also supports queries for any arbitrary language then the
+                include one "Language" element for each language that the styleSearchRequest engine supports. If
+                the styleSearchRequest engine also supports queries for any arbitrary language then the
                 OpenSearch
                 description document should include a Language element with a value of
                 "*". The
                 "language" template parameter in the OpenSearch URL template can be used to
                 allow
                 the
-                search client to choose among the available languages.
+                styleSearchRequest client to choose among the available languages.
                 Restrictions: The
                 value must
                 conform to the XML 1.0 Language Identification, as specified by RFC 3066.
                 In addition,
-                the value of "*" will signify that the search engine does not restrict
-                search results
+                the value of "*" will signify that the styleSearchRequest engine does not restrict
+                styleSearchRequest results
                 to any particular language.
               </xs:documentation>
             </xs:annotation>
@@ -400,14 +400,14 @@
           <xs:element type="xs:string" name="InputEncoding" default="UTF-8" minOccurs="0">
             <xs:annotation>
               <xs:documentation>
-                Contains a string that indicates that the search engine supports
-                search requests encoded with the specified character encoding.
+                Contains a string that indicates that the styleSearchRequest engine supports
+                styleSearchRequest requests encoded with the specified character encoding.
 
                 An OpenSearch
                 description document should include one "InputEncoding" element for each character
-                encoding that can be used to encode search requests. The "inputEncoding" template
-                parameter in the OpenSearch URL template can be used to require the search client to
-                identify which encoding is being used to encode the current search request.
+                encoding that can be used to encode styleSearchRequest requests. The "inputEncoding" template
+                parameter in the OpenSearch URL template can be used to require the styleSearchRequest client to
+                identify which encoding is being used to encode the current styleSearchRequest request.
                 Restrictions: The value must conform to the XML 1.0 Character Encodings, as
                 specified
                 by the IANA Character Set Assignments.
@@ -419,14 +419,14 @@
           <xs:element type="xs:string" name="OutputEncoding" default="UTF-8" minOccurs="0">
             <xs:annotation>
               <xs:documentation>
-                Contains a string that indicates that the search engine supports
-                search responses encoded with the specified character encoding.
+                Contains a string that indicates that the styleSearchRequest engine supports
+                styleSearchRequest responses encoded with the specified character encoding.
 
                 An OpenSearch
                 description document should include one "OutputEncoding" element for each character
-                encoding that can be used to encode search responses. The "outputEncoding" template
-                parameter in the OpenSearch URL template can be used to allow the search client to
-                choose a character encoding in the search response.
+                encoding that can be used to encode styleSearchRequest responses. The "outputEncoding" template
+                parameter in the OpenSearch URL template can be used to allow the styleSearchRequest client to
+                choose a character encoding in the styleSearchRequest response.
                 Restrictions: The value must
                 conform to the XML 1.0 Character Encodings, as specified by the IANA Character Set
                 Assignments.
@@ -443,8 +443,8 @@
     <xs:attribute name="role" use="required">
       <xs:annotation>
         <xs:documentation>
-          role - Contains a string identifying how the search client should
-          interpret the search request
+          role - Contains a string identifying how the styleSearchRequest client should
+          interpret the styleSearchRequest request
           defined by this Query element.
 
           Role values: A role value
@@ -491,31 +491,31 @@
           <xs:enumeration value="request">
             <xs:annotation>
               <xs:documentation>
-                Represents the search query that can be performed to retrieve the
-                same set of search results.
+                Represents the styleSearchRequest query that can be performed to retrieve the
+                same set of styleSearchRequest results.
               </xs:documentation>
             </xs:annotation>
           </xs:enumeration>
           <xs:enumeration value="example">
             <xs:annotation>
               <xs:documentation>
-                Represents a search query that can be performed to demonstrate the
-                search engine.
+                Represents a styleSearchRequest query that can be performed to demonstrate the
+                styleSearchRequest engine.
               </xs:documentation>
             </xs:annotation>
           </xs:enumeration>
           <xs:enumeration value="related">
             <xs:annotation>
               <xs:documentation>
-                Represents a search query that can be performed to retrieve similar
-                but different search results.
+                Represents a styleSearchRequest query that can be performed to retrieve similar
+                but different styleSearchRequest results.
               </xs:documentation>
             </xs:annotation>
           </xs:enumeration>
           <xs:enumeration value="correction">
             <xs:annotation>
               <xs:documentation>
-                Represents a search query that can be performed to improve the
+                Represents a styleSearchRequest query that can be performed to improve the
                 result set, such as with a spelling
                 correction.
               </xs:documentation>
@@ -524,7 +524,7 @@
           <xs:enumeration value="subset">
             <xs:annotation>
               <xs:documentation>
-                Represents a search query that will narrow the current set of search
+                Represents a styleSearchRequest query that will narrow the current set of styleSearchRequest
                 results.
               </xs:documentation>
             </xs:annotation>
@@ -532,8 +532,8 @@
           <xs:enumeration value="superset">
             <xs:annotation>
               <xs:documentation>
-                Represents a search query that will broaden the current set of
-                search results.
+                Represents a styleSearchRequest query that will broaden the current set of
+                styleSearchRequest results.
               </xs:documentation>
             </xs:annotation>
           </xs:enumeration>
@@ -545,7 +545,7 @@
     <xs:attribute name="title" use="optional">
       <xs:annotation>
         <xs:documentation>
-          Contains a human-readable plain text string describing the search request.
+          Contains a human-readable plain text string describing the styleSearchRequest request.
         </xs:documentation>
       </xs:annotation>
       <xs:simpleType>
@@ -558,7 +558,7 @@
     <xs:attribute name="totalResults" use="optional">
       <xs:annotation>
         <xs:documentation>
-          Contains the expected number of results to be found if the search request
+          Contains the expected number of results to be found if the styleSearchRequest request
           were made.
         </xs:documentation>
       </xs:annotation>
@@ -584,7 +584,7 @@
           Contains the value representing the "count" as a OpenSearch 1.1 parameter.
           Search clients should anticipate that the value of the "count" parameter may not be
           honored by the
-          search engine, and should rely exclusively on the contents of the
+          styleSearchRequest engine, and should rely exclusively on the contents of the
           "itemsPerPage" response
           element in calculating actual page size.
 
@@ -599,7 +599,7 @@
         <xs:documentation>
           Contains the value representing the "startIndex" as an OpenSearch 1.1
           parameter.
-          Replaced with the index of the first search result desired by the search client.
+          Replaced with the index of the first styleSearchRequest result desired by the styleSearchRequest client.
 
           Default: The value specified by the "indexOffset" attribute of the containing Url element.
 
@@ -614,7 +614,7 @@
         <xs:documentation>
           Contains the value representing the "startPage" as an OpenSearch 1.1
           parameter.
-          Replaced with the page number of the set of search results desired by the search
+          Replaced with the page number of the set of styleSearchRequest results desired by the styleSearchRequest
           client.
           Default: The value specified by the "pageOffset" attribute of the containing Url
           element.
@@ -629,25 +629,25 @@
         <xs:documentation>
           Contains the value representing the "language" as an OpenSearch 1.1
           parameter.
-          Replaced with a string that indicates that the search client desires search
+          Replaced with a string that indicates that the styleSearchRequest client desires styleSearchRequest
           results in the specified
           language.
 
           An OpenSearch description document should include one
           "Language" element for each language that
-          the search engine supports. If the search engine
+          the styleSearchRequest engine supports. If the styleSearchRequest engine
           also supports queries for any arbitrary
           language then the OpenSearch description document
           should include a Language element with a
           value of "*". The "language" template parameter in
           the OpenSearch URL template can be used
-          to allow the search client to choose among the
+          to allow the styleSearchRequest client to choose among the
           available languages.
 
           Restrictions: The value must conform to the XML 1.0 Language
           Identification, as specified by RFC 3066. In
           addition, a value of "*" will signify that the
-          search client desires search results in any
+          styleSearchRequest client desires styleSearchRequest results in any
           language.
 
         </xs:documentation>
@@ -658,18 +658,18 @@
         <xs:documentation>
           Contains the value representing the "inputEncoding" as an OpenSearch 1.1
           parameter.
-          Replaced with a string that indicates that the search client is performing the
-          search request encoded
+          Replaced with a string that indicates that the styleSearchRequest client is performing the
+          styleSearchRequest request encoded
           with the specified character encoding.
 
           An OpenSearch description
           document should include one "InputEncoding" element for each character
           encoding that can be
-          used to encode search requests. The "inputEncoding" template
+          used to encode styleSearchRequest requests. The "inputEncoding" template
           parameter in the OpenSearch
-          URL template can be used to require the search client to
+          URL template can be used to require the styleSearchRequest client to
           identify which encoding is being
-          used to encode the current search request.
+          used to encode the current styleSearchRequest request.
 
           Restrictions: The value must conform to the XML
           1.0 Character Encodings, as specified by the IANA Character
@@ -681,18 +681,18 @@
     <xs:attribute name="outputEncoding" use="optional">
       <xs:annotation>
         <xs:documentation>
-          Replaced with a string that indicates that the search client desires a
-          search response encoding with
+          Replaced with a string that indicates that the styleSearchRequest client desires a
+          styleSearchRequest response encoding with
           the specified character encoding.
 
           An OpenSearch description
           document should include one "OutputEncoding" element for each character
           encoding that can
-          be used to encode search responses. The "outputEncoding" template
+          be used to encode styleSearchRequest responses. The "outputEncoding" template
           parameter in the
-          OpenSearch URL template can be used to allow the search client to choose
+          OpenSearch URL template can be used to allow the styleSearchRequest client to choose
           a character
-          encoding in the search response.
+          encoding in the styleSearchRequest response.
 
           Restrictions: The value must conform to the XML 1.0
           Character Encodings, as specified by the IANA Character

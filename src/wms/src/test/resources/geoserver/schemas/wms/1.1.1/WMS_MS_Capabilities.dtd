@@ -13,7 +13,7 @@
 <!ELEMENT Title (#PCDATA) >
 
 <!-- The abstract is a longer narrative description of an object. -->
-<!ELEMENT Abstract (#PCDATA) > 
+<!ELEMENT Abstract (#PCDATA) >
 
 <!-- An OnlineResource is typically an HTTP URL.  The URL is placed in the
 xlink:href attribute.  The xmlns:xlink attribute is a required XML namespace
@@ -97,7 +97,7 @@ declaration. -->
 <!-- A Capability lists available request types, how exceptions
 may be reported, and whether any vendor-specific capabilities are defined.  It
 also includes an optional list of map layers available from this server. -->
-<!ELEMENT Capability 
+<!ELEMENT Capability
           (Request, Exception, VendorSpecificCapabilities?,
 	   UserDefinedSymbolization?, Layer?) >
 
@@ -151,7 +151,7 @@ listed here.  At present, only HTTP is defined. -->
                 noSubsets (0 | 1) "0"
                 fixedWidth CDATA #IMPLIED
                 fixedHeight CDATA #IMPLIED >
-          
+
 <!-- Identifier for a single Spatial Reference Systems (SRS). -->
 <!ELEMENT SRS (#PCDATA) >
 
@@ -159,7 +159,7 @@ listed here.  At present, only HTTP is defined. -->
 rectangle in latitude/longitude decimal degrees (as in SRS EPSG:4326 [WGS1984
 lat/lon]). -->
 <!ELEMENT LatLonBoundingBox EMPTY>
-<!ATTLIST LatLonBoundingBox 
+<!ATTLIST LatLonBoundingBox
           minx CDATA #REQUIRED
           miny CDATA #REQUIRED
           maxx CDATA #REQUIRED
@@ -168,7 +168,7 @@ lat/lon]). -->
 <!-- The BoundingBox attributes indicate the edges of the bounding box
 in units of the specified spatial reference system. -->
 <!ELEMENT BoundingBox EMPTY>
-<!ATTLIST BoundingBox 
+<!ATTLIST BoundingBox
           SRS CDATA #REQUIRED
           minx CDATA #REQUIRED
           miny CDATA #REQUIRED

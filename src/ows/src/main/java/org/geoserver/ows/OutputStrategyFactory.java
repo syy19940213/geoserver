@@ -16,11 +16,9 @@ import javax.servlet.http.HttpServletResponse;
  * as to ensure no errors occur during the writing of a response. Another example may include a
  * "speed mode" where data is written directly to the output with no buffering.
  *
- * 输出策略工厂
+ * <p>输出策略工厂
  *
- * 安全模式 ：  先保存到缓存确认没有错误之后再写入response
- * 效率模式 ：  直接写入response
- *
+ * <p>安全模式 ： 先保存到缓存确认没有错误之后再写入response 效率模式 ： 直接写入response
  *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  */

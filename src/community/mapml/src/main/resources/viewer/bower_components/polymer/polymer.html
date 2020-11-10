@@ -3009,7 +3009,7 @@ s = s.replace(DIR_PAREN, DIR_REPLACE);
 return s;
 },
 _transformCompoundSelector: function (selector, combinator, scope, hostScope) {
-var jumpIndex = selector.search(SCOPE_JUMP);
+var jumpIndex = selector.styleSearchRequest(SCOPE_JUMP);
 var hostContext = false;
 var dir = false;
 if (selector.match(DIR_PAREN)) {

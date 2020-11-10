@@ -9,18 +9,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.CatalogFacade;
 import org.geoserver.catalog.CatalogInfo;
@@ -35,6 +30,8 @@ import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.catalog.StoreInfo;
 import org.geoserver.catalog.StyleInfo;
 import org.geoserver.catalog.WorkspaceInfo;
+import org.geoserver.catalog.rsmse.*;
+import org.geoserver.catalog.rsmse.impl.RsmseMapConfigImpl;
 import org.geoserver.catalog.util.CloseableIterator;
 import org.geoserver.catalog.util.CloseableIteratorAdapter;
 import org.geoserver.ows.util.OwsUtils;
@@ -90,6 +87,40 @@ public class DefaultCatalogFacade extends AbstractCatalogFacade implements Catal
                     new NameImpl(
                             s.getWorkspace() != null ? s.getWorkspace().getId() : null,
                             s.getName());
+
+
+    static final Function<RsmseStyleInfo, Name> RSMSE_STYLE_NAME_MAPPER =
+            s ->
+                    new NameImpl(
+                            s.getWorkspace() != null ? s.getWorkspace().getId() : null,
+                            s.getName());
+
+
+    static final Function<RsmseSourceInfo, Name> RSMSE_SOURCE_NAME_MAPPER =
+            s ->
+                    new NameImpl(
+                            s.getWorkspace() != null ? s.getWorkspace().getId() : null,
+                            s.getName());
+
+    static final Function<RsmseSymbolInfo, Name> RSMSE_SYMBOL_NAME_MAPPER =
+            s ->
+                    new NameImpl(
+                            s.getWorkspace() != null ? s.getWorkspace().getId() : null,
+                            s.getName());
+
+
+    static final Function<RsmseMapConfig, Name> RSMSE_MAPCONFIG_NAME_MAPPER =
+            s ->
+                    new NameImpl(
+                            s.getWorkspace() != null ? s.getWorkspace().getId() : null,
+                            s.getName());
+
+    static final Function<RsmseTileRuleInfo, Name> RSMSE_TILERULE_NAME_MAPPER =
+            s ->
+                    new NameImpl(
+                            s.getWorkspace() != null ? s.getWorkspace().getId() : null,
+                            s.getName());
+
 
     static final class LayerInfoLookup extends CatalogInfoLookup<LayerInfo> {
 
@@ -157,6 +188,33 @@ public class DefaultCatalogFacade extends AbstractCatalogFacade implements Catal
 
     /** styles */
     protected CatalogInfoLookup<StyleInfo> styles = new CatalogInfoLookup<>(STYLE_NAME_MAPPER);
+
+
+    /**
+     * 自定义样式
+     */
+    protected CatalogInfoLookup<RsmseStyleInfo> rsmseStyles = new CatalogInfoLookup<>(RSMSE_STYLE_NAME_MAPPER);
+
+    /**
+     * 自定义数据源
+     */
+    protected CatalogInfoLookup<RsmseSourceInfo> rsmseSource = new CatalogInfoLookup<>(RSMSE_SOURCE_NAME_MAPPER);
+
+    /**
+     * 自定义符号
+     */
+    protected CatalogInfoLookup<RsmseSymbolInfo> rsmseSymbol = new CatalogInfoLookup<>(RSMSE_SYMBOL_NAME_MAPPER);
+
+    /**
+     * 自定义地图配置
+     */
+    protected CatalogInfoLookup<RsmseMapConfig> rsmseMapConfig = new CatalogInfoLookup<>(RSMSE_MAPCONFIG_NAME_MAPPER);
+
+    /**
+     * 自定义切片规则
+     */
+    protected CatalogInfoLookup<RsmseTileRuleInfo> rsmseTileRule = new CatalogInfoLookup<>(RSMSE_TILERULE_NAME_MAPPER);
+
 
     /** the catalog */
     private CatalogImpl catalog;
@@ -970,6 +1028,10 @@ public class DefaultCatalogFacade extends AbstractCatalogFacade implements Catal
             other.maps = maps;
             other.layerGroups = layerGroups.setCatalog(catalog);
             other.styles = styles.setCatalog(catalog);
+            other.rsmseStyles = rsmseStyles.setCatalog(catalog);
+            other.rsmseSource = rsmseSource.setCatalog(catalog);
+            other.rsmseSymbol = rsmseSymbol.setCatalog(catalog);
+            other.rsmseMapConfig = rsmseMapConfig.setCatalog(catalog);
         } else {
             // do a manual import
             for (WorkspaceInfo ws : workspaces.values()) {
@@ -990,6 +1052,27 @@ public class DefaultCatalogFacade extends AbstractCatalogFacade implements Catal
             for (LayerInfo l : layers.values()) {
                 dao.add(l);
             }
+
+            for (RsmseStyleInfo l : rsmseStyles.values())
+            {
+                dao.add(l);
+            }
+
+            for (RsmseSourceInfo l : rsmseSource.values())
+            {
+                dao.add(l);
+            }
+
+            for (RsmseSymbolInfo l : rsmseSymbol.values())
+            {
+                dao.add(l);
+            }
+
+            for (RsmseMapConfig l : rsmseMapConfig.values())
+            {
+                dao.add(l);
+            }
+
             for (LayerGroupInfo lg : layerGroups.values()) {
                 dao.add(lg);
             }
@@ -1081,6 +1164,176 @@ public class DefaultCatalogFacade extends AbstractCatalogFacade implements Catal
         Iterator<T> iterator = iterable.iterator();
 
         return new CloseableIteratorAdapter<T>(iterator);
+    }
+
+    @Override
+    public void add(RsmseStyleInfo rsmseStyleInfo)
+    {
+        rsmseStyles.add(rsmseStyleInfo);
+    }
+
+    @Override
+    public void remove(RsmseStyleInfo rsmseStyleInfo)
+    {
+        rsmseStyleInfo = unwrap(rsmseStyleInfo);
+        synchronized (stores) {
+            rsmseStyles.remove(rsmseStyleInfo);
+        }
+    }
+
+    @Override
+    public List<RsmseStyleInfo> getRsmseStyleByName(String name, Integer page, Integer size)
+    {
+        return rsmseStyles.getPageByName(name,page,size,RsmseStyleInfo.class);
+    }
+
+
+    @Override
+    public RsmseStyleInfo getRsmseStyleByName(String name)
+    {
+        return rsmseStyles.findByName(new NameImpl(null, name), RsmseStyleInfo.class);
+    }
+
+    @Override
+    public RsmseStyleInfo getRsmseStyleById(String id)
+    {
+        return rsmseStyles.findById(id,RsmseStyleInfo.class);
+    }
+
+    @Override
+    public void add(RsmseSourceInfo rsmseSourceInfo)
+    {
+        rsmseSource.add(rsmseSourceInfo);
+    }
+
+    @Override
+    public List<RsmseSourceInfo> getRsmseSourceByName(String name, Integer page, Integer pageSize)
+    {
+        return rsmseSource.getPageByName(name,page,pageSize,RsmseSourceInfo.class);
+    }
+
+    @Override
+    public RsmseSourceInfo getRsmseSourceById(String id)
+    {
+        return rsmseSource.findById(id,RsmseSourceInfo.class);
+    }
+
+    @Override
+    public void remove(RsmseSourceInfo rsmseSourceInfo)
+    {
+        rsmseSourceInfo = unwrap(rsmseSourceInfo);
+        synchronized (rsmseSource) {
+            rsmseSource.remove(rsmseSourceInfo);
+        }
+    }
+
+    @Override
+    public RsmseSymbolInfo getRsmseSymbolById(String id)
+    {
+        return rsmseSymbol.findById(id,RsmseSymbolInfo.class);
+    }
+
+    @Override
+    public List<RsmseSymbolInfo> getRsmseSymbolByName(String name, Integer page, Integer pageSize)
+    {
+
+       return rsmseSymbol.getPageByName(name,page,pageSize,RsmseSymbolInfo.class);
+    }
+
+    @Override
+    public void remove(RsmseSymbolInfo rsmseSymbolInfo)
+    {
+        rsmseSymbolInfo = unwrap(rsmseSymbolInfo);
+        synchronized (rsmseSymbol) {
+            rsmseSymbol.remove(rsmseSymbolInfo);
+        }
+
+    }
+
+    @Override
+    public RsmseSourceInfo getRsmseSourceByName(String name)
+    {
+        return rsmseSource.findByName(new NameImpl(null,name),RsmseSourceInfo.class);
+    }
+
+    @Override
+    public RsmseSymbolInfo getRsmseSymbolByName(String name)
+    {
+        return rsmseSymbol.findByName(new NameImpl(null,name),RsmseSymbolInfo.class);
+    }
+
+    @Override
+    public RsmseMapConfig getRsmseMapConfigByName(String name)
+    {
+        return rsmseMapConfig.findByName(new NameImpl(null,name),RsmseMapConfig.class);
+    }
+
+    @Override
+    public List<RsmseMapConfig> getRsmseMapConfigByName(String name, Integer page, Integer pageSize)
+    {
+        return rsmseMapConfig.getPageByName(name,page,pageSize,RsmseMapConfig.class);
+    }
+
+    @Override
+    public void add(RsmseMapConfig mapConfig)
+    {
+        rsmseMapConfig.add(mapConfig);
+    }
+
+    @Override
+    public RsmseMapConfig getRsmseMapConfigById(String id)
+    {
+        return rsmseMapConfig.findById(id,RsmseMapConfig.class);
+    }
+
+    @Override
+    public void remove(RsmseMapConfig mapConfig)
+    {
+        mapConfig = unwrap(mapConfig);
+        synchronized (rsmseMapConfig)
+        {
+            rsmseMapConfig.remove(mapConfig);
+        }
+
+    }
+
+    @Override
+    public RsmseTileRuleInfo getRsmseTileRuleByName(String name)
+    {
+        return rsmseTileRule.findByName(new NameImpl(null,name),RsmseTileRuleInfo.class);
+    }
+
+    @Override
+    public RsmseTileRuleInfo getRsmseTileRuleById(String id)
+    {
+        return rsmseTileRule.findById(id,RsmseTileRuleInfo.class);
+    }
+
+    @Override
+    public void add(RsmseTileRuleInfo rsmseTileRuleInfo)
+    {
+        rsmseTileRule.add(rsmseTileRuleInfo);
+    }
+
+    @Override
+    public List<RsmseTileRuleInfo> getRsmseTileRuleByName(String name, Integer page, Integer pageSize)
+    {
+        return rsmseTileRule.getPageByName(name,page,pageSize,RsmseTileRuleInfo.class);
+    }
+
+    @Override
+    public void remove(RsmseTileRuleInfo rsmseTileRuleInfo)
+    {
+        rsmseTileRuleInfo = unwrap(rsmseTileRuleInfo);
+        synchronized (rsmseTileRule) {
+            rsmseTileRule.remove(rsmseTileRuleInfo);
+        }
+    }
+
+    @Override
+    public void add(RsmseSymbolInfo rsmseSymbolInfo)
+    {
+        rsmseSymbol.add(rsmseSymbolInfo);
     }
 
     @SuppressWarnings("unchecked")

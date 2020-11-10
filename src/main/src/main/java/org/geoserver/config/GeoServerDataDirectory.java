@@ -31,6 +31,8 @@ import org.geoserver.catalog.WMSStoreInfo;
 import org.geoserver.catalog.WMTSLayerInfo;
 import org.geoserver.catalog.WMTSStoreInfo;
 import org.geoserver.catalog.WorkspaceInfo;
+import org.geoserver.catalog.rsmse.*;
+import org.geoserver.catalog.rsmse.impl.RsmseSymbolInfoImpl;
 import org.geoserver.platform.GeoServerExtensions;
 import org.geoserver.platform.GeoServerResourceLoader;
 import org.geoserver.platform.resource.Paths;
@@ -222,6 +224,16 @@ public class GeoServerDataDirectory {
     static final String LAYERGROUP_DIR = "layergroups";
     static final String STYLE_DIR = "styles";
     static final String SECURITY_DIR = "security";
+
+    static final String RSMSE_STYLE_XML = "rsmseStyle.xml";
+    static final String RSMSE_STYLE_DIR = "rsmseStyle";
+    static final String RSMSE_SOURCE_DIR = "rsmseSource";
+    static final String RSMSE_SYMBOL_DIR = "rsmseSymbol";
+    static final String RSMSE_MAPCONFIG_DIR = "rsmseMapConfig";
+    static final String RSMSE_TILERULE_DIR = "rsmseTileRule";
+
+
+
 
     /**
      * Retrieve a resource relative to the root of the data directory. An empty path will retrieve
@@ -531,6 +543,55 @@ public class GeoServerDataDirectory {
     }
 
     /**
+     * 获取Resource
+     * @param l
+     * @param path
+     * @return
+     */
+    public @Nonnull Resource get(RsmseStyleInfo l, String... path) {
+        WorkspaceInfo workspace = null;
+        final Resource r = get(workspace, Paths.path(RSMSE_STYLE_DIR, Paths.path(path)));
+        assert r != null;
+        return r;
+    }
+
+    /**
+     * 获取自定义数据文件的获取Resource
+     * @param l
+     * @param path
+     * @return
+     */
+    public @Nonnull Resource get(RsmseSourceInfo l, String... path) {
+        WorkspaceInfo workspace = null;
+        final Resource r = get(workspace, Paths.path(RSMSE_SOURCE_DIR, Paths.path(path)));
+        assert r != null;
+        return r;
+    }
+
+
+    public @Nonnull Resource get(RsmseSymbolInfo l, String... path) {
+        WorkspaceInfo workspace = null;
+        final Resource r = get(workspace, Paths.path(RSMSE_SYMBOL_DIR, Paths.path(path)));
+        assert r != null;
+        return r;
+    }
+
+    public @Nonnull Resource get(RsmseMapConfig l, String... path) {
+        WorkspaceInfo workspace = null;
+        final Resource r = get(workspace, Paths.path(RSMSE_MAPCONFIG_DIR, Paths.path(path)));
+        assert r != null;
+        return r;
+    }
+
+    public @Nonnull Resource get(RsmseTileRuleInfo l, String... path) {
+        WorkspaceInfo workspace = null;
+        final Resource r = get(workspace, Paths.path(RSMSE_TILERULE_DIR, Paths.path(path)));
+        assert r != null;
+        return r;
+    }
+
+
+    /**
      * Retrieve the layer configuration XML as a Resource
      *
      * @param li The feature type
@@ -538,6 +599,69 @@ public class GeoServerDataDirectory {
      */
     public @Nonnull Resource config(LayerInfo li) {
         Resource r = get(li, LAYER_XML);
+        assert r != null;
+        return r;
+    }
+
+    /**
+     * 自定义样式文件
+     * @param li
+     * @return
+     */
+    public @Nonnull Resource config(RsmseStyleInfo li) {
+        Resource r = get(li, String.format("%s.xml", li.getName()));
+        assert r != null;
+        return r;
+    }
+
+    /**
+     * 自定义数据文件
+     * @param li
+     * @return
+     */
+    public @Nonnull Resource config(RsmseSourceInfo li) {
+        Resource r = get(li, String.format("%s.xml", li.getName()));
+        assert r != null;
+        return r;
+    }
+
+    public @Nonnull Resource config(RsmseSymbolInfo li) {
+        Resource r = get(li, String.format("%s.xml", li.getName()));
+        assert r != null;
+        return r;
+    }
+
+
+
+
+    public @Nonnull Resource config(RsmseMapConfig li) {
+        Resource r = get(li, String.format("%s.xml", li.getName()));
+        assert r != null;
+        return r;
+    }
+
+    public @Nonnull Resource config(RsmseTileRuleInfo li) {
+        Resource r = get(li, String.format("%s.xml", li.getName()));
+        assert r != null;
+        return r;
+    }
+
+
+    public @Nonnull Resource configMapConfig(RsmseMapConfig li) {
+        Resource r = get(li, String.format("%s.map", li.getName()));
+        assert r != null;
+        return r;
+    }
+
+
+
+    /**
+     * 获取sld Resource
+     * @param li
+     * @return
+     */
+    public @Nonnull Resource configSld(RsmseStyleInfo li) {
+        Resource r = get(li, String.format("%s.sld", li.getName()));
         assert r != null;
         return r;
     }
@@ -666,6 +790,15 @@ public class GeoServerDataDirectory {
     public @Nonnull Resource style(StyleInfo s) {
         // Must be a simple filename
         final String filename = s.getFilename();
+        Resource r = get(s, filename);
+        assert r != null;
+        return r;
+    }
+
+
+    public @Nonnull Resource rsmseStyle(RsmseStyleInfo s) {
+        // Must be a simple filename
+        final String filename = s.getPath();
         Resource r = get(s, filename);
         assert r != null;
         return r;
@@ -891,6 +1024,7 @@ public class GeoServerDataDirectory {
         locator.setSourceUrl(URLs.fileToUrl(getStyles(ws).dir()));
         return locator;
     }
+
 
     private class ResourceAwareResourceLocator extends DefaultResourceLocator {
         @Override

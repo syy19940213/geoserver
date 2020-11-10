@@ -4,17 +4,17 @@
   <wicket:link>
     <link rel="stylesheet" type="text/css" href="style.css"/>
   </wicket:link>
-  
+
  <style type="text/css">
    fieldset {
      margin-top: 3em;
    }
-   
+
    #sources li {
      margin: 0;
      padding: 0;
    }
-   
+
    #sources li:first-child {
      margin: 0.3em 0 0;
    }
@@ -37,7 +37,7 @@
       <select id="layer" wicket:id="layer"></select>
 	</fieldset>
   </div>
-  
+
   <form wicket:id="backupForm">
     <h3><span><wicket:message key="issueNewBackup">issueNewBackup</wicket:message></span></h3>
 	<fieldset>
@@ -67,7 +67,7 @@
       <span wicket:id="status">Working</span>
     </div>
     <wicket:message key="mandatory">mandatory</wicket:message> *
-    
+
     <fieldset>
       <legend>
         <span class="no-border"><wicket:message key="recentBackups">recentBackups</wicket:message></span>
@@ -110,7 +110,7 @@
       <span wicket:id="status">Working</span>
     </div>
     <wicket:message key="mandatory">mandatory</wicket:message> *
-    
+
     <fieldset>
       <legend>
         <span class="no-border"><wicket:message key="recentRestores">recentRestores</wicket:message></span>
@@ -123,7 +123,7 @@
       </ul>
     </fieldset>
   </form>
-    
+
   <div wicket:id="dialog"></div>
 </wicket:extend>
 </body>

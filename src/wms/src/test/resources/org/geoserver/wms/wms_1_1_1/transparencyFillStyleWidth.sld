@@ -20,7 +20,7 @@
                  <ogc:Literal>width</ogc:Literal>
                  <ogc:Literal>4</ogc:Literal>
              </ogc:Function>
-          </ogc:Function> 
+          </ogc:Function>
         </Transformation>
         <Rule>
           <MinScaleDenominator>10000</MinScaleDenominator>

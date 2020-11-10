@@ -19,7 +19,7 @@
               <ogc:Function name="parameter">
                 <ogc:Literal>levels</ogc:Literal>
                 <ogc:Literal>100</ogc:Literal>
-                <ogc:Literal>200</ogc:Literal>                
+                <ogc:Literal>200</ogc:Literal>
               </ogc:Function>
             </ogc:Function>
           </Transformation>

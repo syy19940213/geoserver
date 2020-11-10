@@ -34,6 +34,11 @@ public class Request {
     /** flag indicating if the request is a SOAP request */
     protected boolean soap;
 
+    /**
+     * 是否为json请求的标记位
+     */
+    protected boolean json;
+
     /** Kvp parameters, only non-null if get = true */
     protected Map kvp;
 
@@ -240,6 +245,11 @@ public class Request {
         this.soap = soap;
     }
 
+    public void setJson(boolean json)
+    {
+        this.json = json;
+    }
+
     /**
      * Allows callbacks to change the parsed KVP map
      *
@@ -443,5 +453,12 @@ public class Request {
     /** Returns the SOAP namespace used in the request, or null if the request was not a SOAP one */
     public String getSOAPNamespace() {
         return soapNamespace;
+    }
+
+
+
+    public boolean isJson()
+    {
+        return this.json;
     }
 }

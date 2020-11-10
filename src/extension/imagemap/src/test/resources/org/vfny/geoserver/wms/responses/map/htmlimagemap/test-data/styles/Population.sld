@@ -9,7 +9,7 @@
     <!-- again they have names, titles and abstracts -->
   <Name>population</Name>
   <Title>Population in the United States</Title>
-  <Abstract>A sample filter that filters the United States into three 
+  <Abstract>A sample filter that filters the United States into three
             categories of population, drawn in different colors</Abstract>
     <FeatureTypeStyle>
       <Rule>
@@ -31,7 +31,7 @@
               <!-- CssParameters allowed are fill (the color) and fill-opacity -->
               <CssParameter name="fill">#FF4D4D</CssParameter>
               <CssParameter name="fill-opacity">0.7</CssParameter>
-           </Fill>     
+           </Fill>
         </PolygonSymbolizer>
       </Rule>
       <Rule>
@@ -48,7 +48,7 @@
               <!-- CssParameters allowed are fill (the color) and fill-opacity -->
               <CssParameter name="fill">#4DFF4D</CssParameter>
               <CssParameter name="fill-opacity">0.7</CssParameter>
-           </Fill>     
+           </Fill>
         </PolygonSymbolizer>
       </Rule>
       <Rule>
@@ -65,13 +65,13 @@
               <!-- CssParameters allowed are fill (the color) and fill-opacity -->
               <CssParameter name="fill">#4D4DFF</CssParameter>
               <CssParameter name="fill-opacity">0.7</CssParameter>
-           </Fill>     
+           </Fill>
         </PolygonSymbolizer>
       </Rule>
       <Rule>
         <Title>Boundary</Title>
         <LineSymbolizer>
-           <Stroke/>    
+           <Stroke/>
         </LineSymbolizer>
         <TextSymbolizer>
         <Label>

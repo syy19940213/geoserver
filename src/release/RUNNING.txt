@@ -16,9 +16,9 @@ In order to install and run this application, follow these steps:
 * Download a Java Runtime Environment (Java 8 or Java 11) from:
 
     http://openjdk.java.net/
-    
-     or 
-     
+
+     or
+
     https://adoptopenjdk.net
 
 * Install the JRE according to the instructions included with the release.
@@ -28,7 +28,7 @@ In order to install and run this application, follow these steps:
 
 (1) Download and install the GeoServer binary
 
-There is more help available at the GeoServer home page (http://geoserver.org) 
+There is more help available at the GeoServer home page (http://geoserver.org)
 
 * Download a binary distribution of GeoServer from:
 
@@ -75,7 +75,7 @@ There are two techniques by which GeoServer can be started:
       cd $GEOSERVER_HOME/bin
       ./startup.sh
 
-After startup, the default web administration tool included with GeoServer 
+After startup, the default web administration tool included with GeoServer
 will be available by browsing:
 
       http://localhost:8080/geoserver
@@ -118,7 +118,7 @@ distribution of GeoServer:
 
        $GEOSERVER_HOME/start.ini
 
-    and search for 'jetty.port' or '8080'.  Change it to a port that isn't
+    and styleSearchRequest for 'jetty.port' or '8080'.  Change it to a port that isn't
     in use, but is greater than 1024 (such as 8090).  Save this file and
     restart GeoServer.
     Make sure, of course, that you try to access GeoServer on the new port:
@@ -135,7 +135,7 @@ distribution of GeoServer:
 
 (5) Further information
 
-For more information about configuring and running GeoServer, please see the 
+For more information about configuring and running GeoServer, please see the
 GeoServer documentation:
 
     https://docs.geoserver.org

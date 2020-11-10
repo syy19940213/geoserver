@@ -24,6 +24,9 @@ import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.catalog.StoreInfo;
 import org.geoserver.catalog.StyleInfo;
 import org.geoserver.catalog.WorkspaceInfo;
+import org.geoserver.catalog.rsmse.*;
+import org.geoserver.catalog.rsmse.impl.RsmseMapConfigImpl;
+import org.geoserver.catalog.rsmse.impl.RsmseSymbolInfoImpl;
 import org.geoserver.catalog.util.CloseableIterator;
 import org.geoserver.catalog.util.CloseableIteratorAdapter;
 import org.geoserver.ows.Dispatcher;
@@ -521,6 +524,156 @@ final class IsolatedCatalogFacade implements CatalogFacade {
 
     public static <T extends CatalogInfo> T any(Class<T> clazz) {
         return CatalogFacade.any(clazz);
+    }
+
+    @Override
+    public void add(RsmseStyleInfo rsmseStyleInfo)
+    {
+        facade.add(rsmseStyleInfo);
+    }
+
+    @Override
+    public void remove(RsmseStyleInfo rsmseStyleInfo)
+    {
+        facade.remove(rsmseStyleInfo);
+    }
+
+    @Override
+    public List<RsmseStyleInfo> getRsmseStyleByName(String name, Integer page, Integer size)
+    {
+        return facade.getRsmseStyleByName(name,page,size);
+    }
+
+    @Override
+    public RsmseStyleInfo getRsmseStyleByName(String name)
+    {
+        return facade.getRsmseStyleByName(name);
+    }
+
+    @Override
+    public RsmseStyleInfo getRsmseStyleById(String id)
+    {
+        return facade.getRsmseStyleById(id);
+    }
+
+    @Override
+    public void add(RsmseSourceInfo rsmseSourceInfo)
+    {
+        facade.add(rsmseSourceInfo);
+    }
+
+    @Override
+    public List<RsmseSourceInfo> getRsmseSourceByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseSourceByName(name,page,pageSize);
+    }
+
+    @Override
+    public RsmseSourceInfo getRsmseSourceById(String id)
+    {
+       return facade.getRsmseSourceById(id);
+    }
+
+    @Override
+    public void remove(RsmseSourceInfo rsmseSourceInfo)
+    {
+        facade.remove(rsmseSourceInfo);
+    }
+
+    @Override
+    public RsmseSymbolInfo getRsmseSymbolById(String id)
+    {
+        return facade.getRsmseSymbolById(id);
+    }
+
+    @Override
+    public List<RsmseSymbolInfo> getRsmseSymbolByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseSymbolByName(name,page,pageSize);
+    }
+
+    @Override
+    public void remove(RsmseSymbolInfo rsmseSymbolInfo)
+    {
+        facade.remove(rsmseSymbolInfo);
+    }
+
+    @Override
+    public RsmseSourceInfo getRsmseSourceByName(String name)
+    {
+        return facade.getRsmseSourceByName(name);
+    }
+
+    @Override
+    public RsmseSymbolInfo getRsmseSymbolByName(String name)
+    {
+        return facade.getRsmseSymbolByName(name);
+    }
+
+    @Override
+    public RsmseMapConfig getRsmseMapConfigByName(String name)
+    {
+        return facade.getRsmseMapConfigByName(name);
+    }
+
+    @Override
+    public List<RsmseMapConfig> getRsmseMapConfigByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseMapConfigByName(name,page,pageSize);
+    }
+
+    @Override
+    public void add(RsmseMapConfig rsmseMapConfig)
+    {
+        facade.add(rsmseMapConfig);
+    }
+
+    @Override
+    public RsmseMapConfig getRsmseMapConfigById(String id)
+    {
+        return facade.getRsmseMapConfigById(id);
+    }
+
+    @Override
+    public void remove(RsmseMapConfig rsmseMapConfig)
+    {
+        facade.remove(rsmseMapConfig);
+    }
+
+    @Override
+    public RsmseTileRuleInfo getRsmseTileRuleByName(String name)
+    {
+        return facade.getRsmseTileRuleByName(name);
+    }
+
+    @Override
+    public RsmseTileRuleInfo getRsmseTileRuleById(String id)
+    {
+        return facade.getRsmseTileRuleById(id);
+    }
+
+    @Override
+    public void add(RsmseTileRuleInfo rsmseTileRuleInfo)
+    {
+        facade.add(rsmseTileRuleInfo);
+    }
+
+    @Override
+    public List<RsmseTileRuleInfo> getRsmseTileRuleByName(String name, Integer page, Integer pageSize)
+    {
+        return facade.getRsmseTileRuleByName(name,page,pageSize);
+    }
+
+    @Override
+    public void remove(RsmseTileRuleInfo rsmseTileRuleInfo)
+    {
+        facade.remove(rsmseTileRuleInfo);
+    }
+
+    @Override
+    public void add(RsmseSymbolInfo rsmseSymbolInfo)
+    {
+        facade.add(rsmseSymbolInfo);
     }
 
     /**

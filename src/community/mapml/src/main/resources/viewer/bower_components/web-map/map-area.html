@@ -1,11 +1,11 @@
 <!--/* (c) 2019 Open Source Geospatial Foundation - all rights reserved
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
- * Copyright © 2019 World Wide Web Consortium, (Massachusetts Institute of Technology, 
- * European Research Consortium for Informatics and Mathematics, Keio    
- * University, Beihang). All Rights Reserved. This work is distributed under the 
- * W3C® Software License [1] in the hope that it will be useful, but WITHOUT ANY 
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+ * Copyright © 2019 World Wide Web Consortium, (Massachusetts Institute of Technology,
+ * European Research Consortium for Informatics and Mathematics, Keio
+ * University, Beihang). All Rights Reserved. This work is distributed under the
+ * W3C® Software License [1] in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.
  * [1] http://www.w3.org/Consortium/Legal/copyright-software
 */-->
@@ -70,7 +70,7 @@ MapArea = Polymer({
         // need the map to convert container points to LatLngs
         this._map = this.parentElement._map;
         var map = this.parentElement._map;
-    
+
         // don't go through this if already done
         if (!this._feature) {
           // TODO??? SCALE this.coords if the this._map.poster exists because
@@ -80,14 +80,14 @@ MapArea = Polymer({
               points = this.coords ? this._coordsToArray(this.coords): null;
           // scale points if the poster exists because responsive areas
           if (points && this.parentElement.poster) {
-            var worig = this.parentElement.poster.width, 
-                wresp = this.parentElement.width, 
+            var worig = this.parentElement.poster.width,
+                wresp = this.parentElement.width,
                 wadjstmnt = (worig - wresp)/2;
             for (var i = 0; i< points.length;i++) {
               points[i][0] = points[i][0] - wadjstmnt;
             }
           }
-          
+
           if (this.shape === 'marker') {
             if (this.alt) {
               // Leaflet markers use the options.title as a tooltip
@@ -97,7 +97,7 @@ MapArea = Polymer({
             L.Icon.Default.prototype.options.imagePath = M.MapMLLayer.prototype._detectImagePath(map._container);
             this._feature = L.marker(map.containerPointToLatLng(points[0]),options).addTo(map);
           } else if (this.shape === 'circle') {
-            var pixelRadius = parseInt(this.coords.split(",")[2]), 
+            var pixelRadius = parseInt(this.coords.split(",")[2]),
                 pointOnCirc = L.point(points[0]).add(L.point(0,pixelRadius)),
                 latLngOnCirc = map.containerPointToLatLng(pointOnCirc),
                 latLngCenter = map.containerPointToLatLng(points[0]),

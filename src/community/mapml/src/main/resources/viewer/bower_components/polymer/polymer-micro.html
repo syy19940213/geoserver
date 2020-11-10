@@ -51,7 +51,7 @@ addEventListener('DOMContentLoaded', resolve);
 Settings: function () {
 var settings = window.Polymer || {};
 if (!settings.noUrlSettings) {
-var parts = location.search.slice(1).split('&');
+var parts = location.styleSearchRequest.slice(1).split('&');
 for (var i = 0, o; i < parts.length && (o = parts[i]); i++) {
 o = o.split('=');
 o[0] && (settings[o[0]] = o[1] || true);

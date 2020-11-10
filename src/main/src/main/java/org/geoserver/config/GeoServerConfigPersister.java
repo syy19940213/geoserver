@@ -5,10 +5,11 @@
  */
 package org.geoserver.config;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.apache.commons.io.IOUtils;
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.CatalogException;
 import org.geoserver.catalog.CoverageInfo;
@@ -31,10 +32,15 @@ import org.geoserver.catalog.event.CatalogListener;
 import org.geoserver.catalog.event.CatalogModifyEvent;
 import org.geoserver.catalog.event.CatalogPostModifyEvent;
 import org.geoserver.catalog.event.CatalogRemoveEvent;
+import org.geoserver.catalog.rsmse.*;
+import org.geoserver.catalog.rsmse.impl.RsmseMapConfigImpl;
+import org.geoserver.catalog.rsmse.impl.RsmseSourceInfoImpl;
+import org.geoserver.catalog.rsmse.impl.RsmseSymbolInfoImpl;
 import org.geoserver.config.util.XStreamPersister;
 import org.geoserver.platform.ExtensionPriority;
 import org.geoserver.platform.GeoServerResourceLoader;
 import org.geoserver.platform.resource.Resource;
+import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.util.logging.Logging;
 
 /**
@@ -57,6 +63,7 @@ public class GeoServerConfigPersister
         this.xp = xp;
     }
 
+    @Override
     public void handleAddEvent(CatalogAddEvent event) {
         Object source = event.getSource();
         try {
@@ -86,9 +93,98 @@ public class GeoServerConfigPersister
                 addStyle((StyleInfo) source);
             } else if (source instanceof LayerGroupInfo) {
                 addLayerGroup((LayerGroupInfo) source);
+            } else if (source instanceof RsmseStyleInfo) {
+                addRsmseStyleInfo((RsmseStyleInfo)source);
+            } else if (source instanceof RsmseSourceInfo) {
+                addRsmseSourceInfo((RsmseSourceInfo) source);
+            } else if (source instanceof RsmseSymbolInfo) {
+                addRsmseSymbolInfo((RsmseSymbolInfoImpl) source);
+            } else if (source instanceof RsmseMapConfig) {
+                addRsmseMapConfig((RsmseMapConfig) source);
+            } else if (source instanceof RsmseTileRuleInfo) {
+                addRsmseTileRule((RsmseTileRuleInfo) source);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 添加切片规则
+     * @param lg
+     */
+    private void addRsmseTileRule(RsmseTileRuleInfo lg) throws IOException
+    {
+        LOGGER.fine("Persisting rsmseSource  " + lg.getName());
+        Resource xml = dd.config(lg);
+        persist(lg, xml);
+    }
+
+    /**
+     * 持久化map
+     * @param lg
+     */
+    private void addRsmseMapConfig(RsmseMapConfig lg) throws IOException
+    {
+        LOGGER.fine("Persisting MapConfig  " + lg.getName());
+        RsmseMapConfigImpl source = (RsmseMapConfigImpl) lg;
+
+        String data = source.getMapData();
+        source.setMapData(null);
+        Resource xml = dd.config(source);
+        persist(lg, xml);
+
+        // .map文件持久化
+        Resource sld = dd.configMapConfig(lg);
+        writeStyle(new ByteArrayInputStream(data.getBytes()),sld);
+    }
+
+    /**
+     * 持久化符号文件
+     * @param lg
+     */
+    private void addRsmseSymbolInfo(RsmseSymbolInfoImpl lg) throws IOException
+    {
+        LOGGER.fine("Persisting rsmseSource  " + lg.getName());
+        Resource xml = dd.config(lg);
+        persist(lg, xml);
+
+    }
+
+    /**
+     * 添加自定义数据文件
+     * @param lg
+     */
+    private void addRsmseSourceInfo(RsmseSourceInfo lg) throws IOException
+    {
+        LOGGER.fine("Persisting rsmseSource  " + lg.getName());
+        Resource xml = dd.config(lg);
+        persist(lg, xml);
+    }
+
+    /**
+     * 添加自定义样式文件
+     * @param lg
+     * @throws IOException
+     */
+    private void addRsmseStyleInfo(RsmseStyleInfo lg) throws IOException
+    {
+        LOGGER.fine("Persisting rsmseStyle group " + lg.getName());
+        String data = lg.getData();
+        lg.setData("");
+        Resource xml = dd.config(lg);
+        persist(lg, xml);
+
+        Resource sld = dd.configSld(lg);
+        writeStyle(new ByteArrayInputStream(data.getBytes()),sld);
+
+    }
+
+    public void writeStyle(final InputStream in, final Resource sld)
+            throws IOException {
+        try (BufferedOutputStream out = new BufferedOutputStream(sld.out())) {
+            IOUtils.copy(in, out);
+            out.flush();
         }
     }
 
@@ -227,11 +323,65 @@ public class GeoServerConfigPersister
                 removeStyle((StyleInfo) source);
             } else if (source instanceof LayerGroupInfo) {
                 removeLayerGroup((LayerGroupInfo) source);
+            } else if (source instanceof RsmseStyleInfo) {
+                removeRsmseStyle((RsmseStyleInfo) source);
+            } else if (source instanceof RsmseSourceInfo) {
+                removeRsmseSource((RsmseSourceInfo) source);
+            } else if (source instanceof RsmseSymbolInfo) {
+                removeRsmseSymbol((RsmseSymbolInfo) source);
+            } else if (source instanceof RsmseMapConfig) {
+                removeRsmseMapConfig((RsmseMapConfig) source);
+            } else if (source instanceof RsmseTileRuleInfo) {
+                removeRsmseTileRule((RsmseTileRuleInfo) source);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private void removeRsmseTileRule(RsmseTileRuleInfo source)
+    {
+        LOGGER.fine("Removing TileRule " + source.getName());
+        Resource tileRule = dd.config(source);
+        rmRes(tileRule);
+    }
+
+    private void removeRsmseMapConfig(RsmseMapConfig source)
+    {
+        LOGGER.fine("Removing MapConfig " + source.getName());
+        Resource mapconfig = dd.config(source);
+        rmRes(mapconfig);
+
+        Resource map = dd.configMapConfig(source);
+        rmRes(map);
+    }
+
+    private void removeRsmseSymbol(RsmseSymbolInfo source)
+    {
+        LOGGER.fine("Removing RsmseSymbol " + source.getName());
+        Resource symbol = dd.config(source);
+        rmRes(symbol);
+    }
+
+    private void removeRsmseStyle(RsmseStyleInfo source)
+    {
+        LOGGER.fine("Removing RsmseStyle " + source.getName());
+        Resource directory = dd.config(source);
+        rmRes(directory);
+
+
+        Resource sld = dd.configSld(source);
+        rmRes(sld);
+
+    }
+
+    private void removeRsmseSource(RsmseSourceInfo source)
+    {
+        LOGGER.fine("Removing RsmseSource " + source.getName());
+        Resource directory = dd.config(source);
+        rmRes(directory);
+    }
+
 
     public void handleGlobalChange(
             GeoServerInfo global,

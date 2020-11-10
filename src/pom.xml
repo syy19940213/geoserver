@@ -78,7 +78,7 @@
     <enabled>false</enabled>
    </releases>
   </repository>
-   
+
    <repository>
       <id>geosolutions</id>
       <name>geosolutions repository</name>
@@ -94,6 +94,11 @@
 
  <dependencyManagement>
   <dependencies>
+   <dependency>
+    <groupId>org.geoserver</groupId>
+    <artifactId>rsmse-web</artifactId>
+    <version>${gs.version}</version>
+   </dependency>
    <dependency>
     <groupId>org.geoserver</groupId>
     <artifactId>gs-platform</artifactId>
@@ -622,7 +627,7 @@
     <artifactId>junit</artifactId>
     <version>4.13.1</version>
     <scope>test</scope>
-   </dependency> 
+   </dependency>
    <dependency>
      <groupId>org.awaitility</groupId>
      <artifactId>awaitility</artifactId>
@@ -668,7 +673,7 @@
      <groupId>org.mockito</groupId>
      <artifactId>mockito-core</artifactId>
      <version>2.23.0</version>
-   </dependency>    
+   </dependency>
    <dependency>
      <groupId>xalan</groupId>
      <artifactId>xalan</artifactId>
@@ -938,7 +943,7 @@
      <groupId>org.apache.wicket</groupId>
      <artifactId>wicket-spring</artifactId>
      <version>${wicket.version}</version>
-   </dependency>			
+   </dependency>
    <dependency>
      <groupId>org.apache.wicket</groupId>
      <artifactId>wicket-extensions</artifactId>
@@ -1062,8 +1067,8 @@
     <artifactId>freemarker</artifactId>
     <version>2.3.18</version>
    </dependency>
-   <dependency> 
-     <groupId>net.sf.json-lib</groupId> 
+   <dependency>
+     <groupId>net.sf.json-lib</groupId>
      <artifactId>json-lib</artifactId>
      <version>2.4.2-geoserver</version>
    </dependency>
@@ -1103,11 +1108,11 @@
      <artifactId>activation</artifactId>
      <version>1.1</version>
    </dependency>
-   <dependency> 
+   <dependency>
      <!-- needed by the arcsde plugin -->
-     <groupId>jsqlparser</groupId> 
-     <artifactId>jsqlparser</artifactId> 
-     <version>0.3.14</version> 
+     <groupId>jsqlparser</groupId>
+     <artifactId>jsqlparser</artifactId>
+     <version>0.3.14</version>
    </dependency>
      <dependency>
       <groupId>org.restlet</groupId>
@@ -1115,7 +1120,7 @@
       <version>1.0.8</version>
 
       <!-- Classifier selects a hacked JAR where we've removed a class we don't need and which has a security vulnerability.  This should be removed when we update to A current version of Restlet (2.2 or later)-->
-      <classifier>noobjrep</classifier> 
+      <classifier>noobjrep</classifier>
 
     </dependency>
     <dependency>
@@ -1209,9 +1214,9 @@
 	  <groupId>javax.jms</groupId>
 	  <artifactId>jms-api</artifactId>
 	  <version>1.1-rev-1</version>
-	</dependency>    
-	<!-- Needed to solve NamespaceHandler class org.apache.xbean.spring.context.v2.XBeanNamespaceHandler 
-	  for namespace [http://activemq.apache.org/schema/core] not found ClassNotFoundException: 
+	</dependency>
+	<!-- Needed to solve NamespaceHandler class org.apache.xbean.spring.context.v2.XBeanNamespaceHandler
+	  for namespace [http://activemq.apache.org/schema/core] not found ClassNotFoundException:
 	  org.apache.xbean.spring.context.v2.XBeanNamespaceHandler<br> ref: http://codebrane.com/blog/?p=823 -->
 	<dependency>
 		<groupId>org.apache.xbean</groupId>
@@ -1223,7 +1228,7 @@
 		<artifactId>commons-logging</artifactId>
 		  </exclusion>
 		</exclusions>
-	</dependency>  
+	</dependency>
 	<dependency>
 		<groupId>it.geosolutions</groupId>
 		<artifactId>geoserver-manager</artifactId>
@@ -1235,7 +1240,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>${joda-time.version}</version> 
+      <version>${joda-time.version}</version>
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
@@ -1464,7 +1469,7 @@
 
 
   <plugins>
-  
+
    <!-- compilation -->
    <plugin>
      <groupId>org.apache.maven.plugins</groupId>
@@ -1475,7 +1480,7 @@
        <target>1.8</target>
        <debug>true</debug>
        <encoding>UTF-8</encoding>
-       <fork>${fork.javac}</fork> 
+       <fork>${fork.javac}</fork>
        <maxmem>${javac.maxHeapSize}</maxmem>
      </configuration>
    </plugin>
@@ -1547,7 +1552,7 @@
       <descriptor>release/ext-mongodb.xml</descriptor>
       <descriptor>release/ext-xslt.xml</descriptor>
       <descriptor>release/ext-inspire.xml</descriptor>
-      <descriptor>release/ext-css.xml</descriptor>      
+      <descriptor>release/ext-css.xml</descriptor>
       <descriptor>release/ext-csw.xml</descriptor>
       <descriptor>release/ext-dxf.xml</descriptor>
       <descriptor>release/ext-printing.xml</descriptor>
@@ -1681,7 +1686,7 @@
      <quiet>true</quiet>
      <maxmemory>256M</maxmemory>
      <encoding>UTF-8</encoding>
-     
+
      <additionalparam>-Xdoclint:none</additionalparam>
      <breakiterator>true</breakiterator>
      <tags>
@@ -1748,7 +1753,7 @@
        </execution>
      </executions>
    </plugin>
-   
+
    <plugin>
     <groupId>org.commonjava.maven.plugins</groupId>
     <artifactId>directory-maven-plugin</artifactId>
@@ -1899,7 +1904,7 @@
           <format>html</format>
           <format>xml</format>
        </formats>
-    </configuration> 
+    </configuration>
    </plugin>
 
   </plugins>
@@ -1942,6 +1947,7 @@
   <module>web</module>
   <module>community</module>
   <module>extension</module>
+  <module>rsmse-web</module>
  </modules>
 
  <properties>
@@ -2150,10 +2156,10 @@
       <module>release</module>
     </modules>
   </profile>
-  
+
   <profile>
     <id>findbugs</id>
-    <build> 
+    <build>
       <plugins>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -2164,7 +2170,7 @@
           </configuration>
         </plugin>
       </plugins>
-    </build> 
+    </build>
    </profile>
    <profile>
      <id>skipSystemTests</id>
@@ -2232,7 +2238,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>pmd</id>
       <activation>
@@ -2291,7 +2297,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <!-- for those using JDK 11 -->
     <profile>
       <id>errorprone</id>
@@ -2329,7 +2335,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <!-- using github.com/google/error-prone-javac is required when running on JDK 8 -->
     <profile>
       <id>errorprone8</id>
@@ -2368,7 +2374,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>spotbugs</id>
       <activation>
@@ -2401,7 +2407,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>checkstyle</id>
       <activation>
@@ -2431,7 +2437,7 @@
             </executions>
           </plugin>
         </plugins>
-      </build>  
+      </build>
     </profile>
   </profiles>
 

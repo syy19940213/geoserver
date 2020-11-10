@@ -3581,7 +3581,7 @@
           <fes:Argument name="string">
             <fes:Type>xs:string</fes:Type>
           </fes:Argument>
-          <fes:Argument name="search">
+          <fes:Argument name="styleSearchRequest">
             <fes:Type>xs:string</fes:Type>
           </fes:Argument>
           <fes:Argument name="replace">

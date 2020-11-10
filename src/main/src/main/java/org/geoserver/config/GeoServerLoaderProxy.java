@@ -39,8 +39,8 @@ public class GeoServerLoaderProxy
     }
 
     /**
-     * 通过spring Aware调用 创建resourceLoader
-     * 默认创建为DefaultGeoServerLoader
+     * 通过spring Aware调用 创建resourceLoader 默认创建为DefaultGeoServerLoader
+     *
      * @param applicationContext
      * @throws BeansException
      */
@@ -58,7 +58,8 @@ public class GeoServerLoaderProxy
     }
 
     /**
-     * spring的BeanPostProcessor   在bean创建时调用
+     * spring的BeanPostProcessor 在bean创建时调用
+     *
      * @param bean
      * @param beanName
      * @return

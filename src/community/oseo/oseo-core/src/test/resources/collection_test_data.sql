@@ -448,7 +448,7 @@ INSERT INTO collection_metadata ("mid","metadata") VALUES (
               <gmd:function>
                 <gmd:CI_OnLineFunctionCode
                   codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_OnLineFunctionCode"
-                  codeListValue="search" />
+                  codeListValue="styleSearchRequest" />
               </gmd:function>
             </gmd:CI_OnlineResource>
           </gmd:onLine>
@@ -880,7 +880,7 @@ INSERT INTO collection_metadata ("mid","metadata") VALUES (
               <gmd:function>
                 <gmd:CI_OnLineFunctionCode
                   codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_OnLineFunctionCode"
-                  codeListValue="search" />
+                  codeListValue="styleSearchRequest" />
               </gmd:function>
             </gmd:CI_OnlineResource>
           </gmd:onLine>

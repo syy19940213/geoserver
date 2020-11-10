@@ -4,7 +4,7 @@
        <li><i>Simple Line Symbol:</i></li>
        <li>Color: <#call color(o.color)>, Width: ${o.width}</li>
    </ul>
-</#macro> 
+</#macro>
 <#macro symbol(symbol)>
 <li>Symbol:
     <ul>

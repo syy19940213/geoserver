@@ -18,19 +18,19 @@
                 padding-bottom: 0.5em;
                 display: none;
             }
-            
+
             #toolbar ul {
                 list-style: none;
                 padding: 0;
                 margin: 0;
             }
-            
+
             #toolbar ul li {
                 float: left;
                 padding-right: 1em;
                 padding-bottom: 0.5em;
             }
-            
+
             #toolbar ul li a {
                 font-weight: bold;
                 font-size: smaller;
@@ -42,7 +42,7 @@
             #toolbar ul li a:hover {
                 text-decoration: underline;
             }
-            
+
             #toolbar ul li * {
                 vertical-align: middle;
             }
@@ -55,15 +55,15 @@
                 height: ${request.height?c}px;
                 border: 1px solid black;
             }
-            
+
             #wrapper {
                 width: ${request.width?c}px;
             }
-            
+
             #location {
                 float: right;
             }
-            
+
             #options {
                 position: absolute;
                 left: 13px;
@@ -80,21 +80,21 @@
                 font-size: 90%;
                 padding: .2em .1em;
             }
-            
+
             table.featureInfo th {
                 padding: .2em .2em;
                 font-weight: bold;
                 background: #eee;
             }
-            
+
             table.featureInfo td {
                 background: #fff;
             }
-            
+
             table.featureInfo tr.odd td {
                 background: #eee;
             }
-            
+
             table.featureInfo caption {
                 text-align: left;
                 font-size: 100%;
@@ -115,7 +115,7 @@
             OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
             // make OL compute scale according to WMS spec
             OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
-        
+
             function init(){
                 // if this is just a coverage or a group of them, disable a few items,
                 // and default to jpeg format
@@ -133,7 +133,7 @@
                     document.getElementById('updateFilterButton').disabled = true;
                     document.getElementById('resetFilterButton').disabled = true;
                 }
-            
+
                 var bounds = new OpenLayers.Bounds(
                     ${request.bbox.minX?c}, ${request.bbox.minY?c},
                     ${request.bbox.maxX?c}, ${request.bbox.maxY?c}
@@ -146,7 +146,7 @@
                     units: '${units?js_string}'
                 };
                 map = new OpenLayers.Map('map', options);
-            
+
                 // setup tiled layer
                 tiled = new OpenLayers.Layer.WMS(
                     "${layerName} - Tiled", "${baseUrl}/${servicePath}",
@@ -163,9 +163,9 @@
                         displayOutsideMaxExtent: true,
                         isBaseLayer: true,
                         yx : {'${request.SRS?js_string}' : ${yx}}
-                    } 
+                    }
                 );
-                  
+
                 // setup single tiled layer
                 untiled = new OpenLayers.Layer.WMS(
                     "${layerName} - Untiled", "${baseUrl}/${servicePath}",
@@ -176,13 +176,13 @@
                         format: format
                     },
                     {
-                       singleTile: true, 
-                       ratio: 1, 
+                       singleTile: true,
+                       ratio: 1,
                        isBaseLayer: true,
                        yx : {'${request.SRS?js_string}' : ${yx}}
-                    } 
+                    }
                 );
-        
+
                 map.addLayers([untiled, tiled]);
 
                 // build up all controls
@@ -193,11 +193,11 @@
                 map.addControl(new OpenLayers.Control.Scale($('scale')));
                 map.addControl(new OpenLayers.Control.MousePosition({element: $('location')}));
                 map.zoomToExtent(bounds);
-                
+
                 // wire up the option button
                 var options = document.getElementById("options");
                 options.onclick = toggleControlPanel;
-                
+
                 // support GetFeatureInfo
                 map.events.register('click', map, function (e) {
                     document.getElementById('nodelist').innerHTML = "Loading... please wait...";
@@ -210,7 +210,7 @@
                         QUERY_LAYERS: map.layers[0].params.LAYERS,
                         FEATURE_COUNT: 50,
                         <#assign skipped=["request","bbox","width","height","format", "styles"]>
-                        <#list parameters as param>            
+                        <#list parameters as param>
                         <#if !(skipped?seq_contains(param.name?lower_case))>
                         "${(param.name?js_string)?capitalize}": '${param.value?js_string}',
                         </#if>
@@ -220,7 +220,7 @@
                         format: format,
                         styles: map.layers[0].params.STYLES,
                         srs: map.layers[0].params.SRS};
-                    
+
                     // handle the wms 1.3 vs wms 1.1 madness
                     if(map.layers[0].params.VERSION == "1.3.0") {
                         params.version = "1.3.0";
@@ -231,11 +231,11 @@
                         params.x = parseInt(e.xy.x);
                         params.y = parseInt(e.xy.y);
                     }
-                        
+
                     // merge filters
                     if(map.layers[0].params.CQL_FILTER != null) {
                         params.cql_filter = map.layers[0].params.CQL_FILTER;
-                    } 
+                    }
                     if(map.layers[0].params.FILTER != null) {
                         params.filter = map.layers[0].params.FILTER;
                     }
@@ -246,12 +246,12 @@
                     OpenLayers.Event.stop(e);
                 });
             }
-            
+
             // sets the HTML provided into the nodelist element
             function setHTML(response){
                 document.getElementById('nodelist').innerHTML = response.responseText;
             };
-            
+
             // shows/hide the control panel
             function toggleControlPanel(event){
                 var toolbar = document.getElementById("toolbar");
@@ -264,7 +264,7 @@
                 event.stopPropagation();
                 map.updateSize()
             }
-            
+
             // Tiling mode, can be 'tiled' or 'untiled'
             function setTileMode(tilingMode){
                 if (tilingMode == 'tiled') {
@@ -278,7 +278,7 @@
                     map.setBaseLayer(untiled);
                 }
             }
-            
+
             // Transition effect, can be null or 'resize'
             function setTransitionMode(transitionEffect){
                 if (transitionEffect === 'resize') {
@@ -290,13 +290,13 @@
                     untiled.transitionEffect = null;
                 }
             }
-            
+
             // changes the current tile format
             function setImageFormat(mime){
                 // we may be switching format on setup
                 if(tiled == null)
                   return;
-                  
+
                 tiled.mergeNewParams({
                     format: mime
                 });
@@ -315,13 +315,13 @@
                 }
                 */
             }
-            
+
             // sets the chosen style
             function setStyle(style){
                 // we may be switching style on setup
                 if(tiled == null)
                   return;
-                  
+
                 tiled.mergeNewParams({
                     styles: style
                 });
@@ -329,19 +329,19 @@
                     styles: style
                 });
             }
-            
+
             // sets the chosen WMS version
             function setWMSVersion(wmsVersion){
                 // we may be switching style on setup
                 if(wmsVersion == null)
                   return;
-                  
+
                 if(wmsVersion == "1.3.0") {
                    origin = map.maxExtent.bottom + ',' + map.maxExtent.left;
                 } else {
                    origin = map.maxExtent.left + ',' + map.maxExtent.bottom;
                 }
-                  
+
                 tiled.mergeNewParams({
                     version: wmsVersion,
                     tilesOrigin : origin
@@ -350,7 +350,7 @@
                     version: wmsVersion
                 });
             }
-            
+
             function setAntialiasMode(mode){
                 tiled.mergeNewParams({
                     format_options: 'antialias:' + mode
@@ -359,7 +359,7 @@
                     format_options: 'antialias:' + mode
                 });
             }
-            
+
             function setPalette(mode){
                 if (mode == '') {
                     tiled.mergeNewParams({
@@ -378,11 +378,11 @@
                     });
                 }
             }
-            
+
             function setWidth(size){
                 var mapDiv = document.getElementById('map');
                 var wrapper = document.getElementById('wrapper');
-                
+
                 if (size == "auto") {
                     // reset back to the default value
                     mapDiv.style.width = null;
@@ -395,10 +395,10 @@
                 // notify OL that we changed the size of the map div
                 map.updateSize();
             }
-            
+
             function setHeight(size){
                 var mapDiv = document.getElementById('map');
-                
+
                 if (size == "auto") {
                     // reset back to the default value
                     mapDiv.style.height = null;
@@ -409,14 +409,14 @@
                 // notify OL that we changed the size of the map div
                 map.updateSize();
             }
-            
+
             function updateFilter(){
                 if(!supportsFiltering)
                   return;
-            
+
                 var filterType = document.getElementById('filterType').value;
                 var filter = document.getElementById('filter').value;
-                
+
                 // by default, reset all filters
                 var filterParams = {
                     filter: null,
@@ -424,25 +424,25 @@
                     featureId: null
                 };
                 if (OpenLayers.String.trim(filter) != "") {
-                    if (filterType == "cql") 
+                    if (filterType == "cql")
                         filterParams["cql_filter"] = filter;
-                    if (filterType == "ogc") 
+                    if (filterType == "ogc")
                         filterParams["filter"] = filter;
-                    if (filterType == "fid") 
+                    if (filterType == "fid")
                         filterParams["featureId"] = filter;
                 }
                 // merge the new filter definitions
                 mergeNewParams(filterParams);
             }
-            
+
             function resetFilter() {
                 if(!supportsFiltering)
                   return;
-            
+
                 document.getElementById('filter').value = "";
                 updateFilter();
             }
-            
+
             function mergeNewParams(params){
                 tiled.mergeNewParams(params);
                 untiled.mergeNewParams(params);
@@ -496,12 +496,12 @@
                     <a>Styles:</a>
                     <select id="imageFormatSelector" onchange="setStyle(value)">
                         <option value="">Default</option>
-                        <#list styles as style>          
-                          <option value="${style}">${style}</option>  
-                        </#list>     
+                        <#list styles as style>
+                          <option value="${style}">${style}</option>
+                        </#list>
                     </select>
                 </li>
-                <!-- Commented out for the moment, some code needs to be extended in 
+                <!-- Commented out for the moment, some code needs to be extended in
                      order to list the available palettes
                 <li>
                     <a>Palette:</a>

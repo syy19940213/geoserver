@@ -37,6 +37,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -74,9 +76,9 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * <p>An OWS request contains three bits of information:
  *
  * <ol>
- *   <li>The service being called
- *   <li>The operation of the service to execute
- *   <li>The version of the service ( optional )
+ * <li>The service being called
+ * <li>The operation of the service to execute
+ * <li>The version of the service ( optional )
  * </ol>
  *
  * <p>Additional, an OWS request can contain an arbitray number of additional parameters.
@@ -110,43 +112,68 @@ import org.xmlpull.v1.XmlPullParserFactory;
  *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  */
-public class Dispatcher extends AbstractController {
-    /** Logging instance */
+public class Dispatcher extends AbstractController
+{
+    /**
+     * Logging instance
+     */
     static Logger logger = org.geotools.util.logging.Logging.getLogger("org.geoserver.ows");
 
-    /** flag to control wether the dispatcher is cite compliant */
+    /**
+     * flag to control wether the dispatcher is cite compliant
+     */
     boolean citeCompliant = false;
 
-    /** buffer size for incoming XML POST requests */
+    /**
+     * buffer size for incoming XML POST requests
+     */
     int xmlPostRequestLogBufferSize = 1024;
 
-    /** thread local variable for the request */
+    /**
+     * thread local variable for the request
+     */
     public static final ThreadLocal<Request> REQUEST = new InheritableThreadLocal<Request>();
 
     static final Charset UTF8 = Charset.forName("UTF-8");
 
-    /** The amount of bytes to be read to determine the proper xml reader in POST request */
+    /**
+     * The amount of bytes to be read to determine the proper xml reader in POST request
+     */
     int XML_LOOKAHEAD = 8192;
 
-    /** list of callbacks */
+    /**
+     * list of callbacks
+     */
     List<DispatcherCallback> callbacks = Collections.EMPTY_LIST;
 
-    /** SOAP namespaces */
+    /**
+     * SOAP namespaces
+     */
     public static final String SOAP_12_NS = "http://www.w3.org/2003/05/soap-envelope";
 
     public static final String SOAP_11_NS = "http://schemas.xmlsoap.org/soap/envelope/";
 
-    /** SOAP mime type */
+    /**
+     * SOAP mime type
+     */
     static final String SOAP_MIME = "application/soap+xml";
+
+    /**
+     * json头部
+     */
+    static final String JSON_MIME = "application/json";
 
     private Method getEntityResolver = null;
 
     {
-        try {
+        try
+        {
             // Use reflection to access class/method in the gs-main module.
             Class<?> clazz = Class.forName("org.geoserver.util.EntityResolverProvider");
             getEntityResolver = clazz.getMethod("getEntityResolver");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // This should only happen when running the gs-ows unit tests.
             logger.log(
                     Level.WARNING,
@@ -167,23 +194,28 @@ public class Dispatcher extends AbstractController {
      *
      * @param citeCompliant <code>true</code> to set compliance, <code>false</code> to unset it.
      */
-    public void setCiteCompliant(boolean citeCompliant) {
+    public void setCiteCompliant(boolean citeCompliant)
+    {
         this.citeCompliant = citeCompliant;
     }
 
-    public boolean isCiteCompliant() {
+    public boolean isCiteCompliant()
+    {
         return citeCompliant;
     }
 
     @Override
-    protected void initApplicationContext(ApplicationContext context) {
+    protected void initApplicationContext(ApplicationContext context)
+    {
         // load life cycle callbacks
         callbacks = GeoServerExtensions.extensions(DispatcherCallback.class, context);
 
         // setup the xml lookahead value
         String lookahead = GeoServerExtensions.getProperty("XML_LOOKAHEAD", context);
-        if (lookahead != null) {
-            try {
+        if (lookahead != null)
+        {
+            try
+            {
                 int lookaheadValue = Integer.valueOf(lookahead);
                 if (lookaheadValue <= 0)
                     logger.log(
@@ -193,7 +225,9 @@ public class Dispatcher extends AbstractController {
                                     + XML_LOOKAHEAD
                                     + " instead");
                 XML_LOOKAHEAD = lookaheadValue;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 logger.log(
                         Level.SEVERE,
                         "Invalid XML_LOOKAHEAD value, " + "will use " + XML_LOOKAHEAD + " instead");
@@ -201,16 +235,20 @@ public class Dispatcher extends AbstractController {
         }
     }
 
-    protected void preprocessRequest(HttpServletRequest request) throws Exception {
+    protected void preprocessRequest(HttpServletRequest request) throws Exception
+    {
         // set the charset
         Charset charSet = null;
 
         // TODO: make this server settable
         charSet = UTF8;
         if (request.getCharacterEncoding() != null)
-            try {
+            try
+            {
                 charSet = Charset.forName(request.getCharacterEncoding());
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 // ok, we tried...
             }
 
@@ -219,13 +257,15 @@ public class Dispatcher extends AbstractController {
 
     /**
      * 继承AbstractController，在sevlet请求进入时调用，为方法入口
+     *
      * @param httpRequest
      * @param httpResponse
      * @return
      * @throws Exception
      */
     protected ModelAndView handleRequestInternal(
-            HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws Exception {
+            HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws Exception
+    {
         preprocessRequest(httpRequest);
 
         // create a new request instance
@@ -237,7 +277,8 @@ public class Dispatcher extends AbstractController {
 
         Service service = null;
 
-        try {
+        try
+        {
             // initialize the request and allow callbacks to override it
             request = init(request);
 
@@ -245,16 +286,20 @@ public class Dispatcher extends AbstractController {
             REQUEST.set(request);
 
             // find the service
-            try {
+            try
+            {
                 service = service(request);
-            } catch (Throwable t) {
+            }
+            catch (Throwable t)
+            {
                 exception(t, null, request);
 
                 return null;
             }
 
             // throw any outstanding errors
-            if (request.getError() != null) {
+            if (request.getError() != null)
+            {
                 throw request.getError();
             }
 
@@ -262,7 +307,8 @@ public class Dispatcher extends AbstractController {
             Operation operation = dispatch(request, service);
             request.setOperation(operation);
 
-            if (request.isSOAP()) {
+            if (request.isSOAP())
+            {
                 // let the request object know that this is a SOAP request, since it effects
                 // often how the request will be encoded
                 flagAsSOAP(operation);
@@ -272,15 +318,20 @@ public class Dispatcher extends AbstractController {
             Object result = execute(request, operation);
 
             // write the response
-            if (result != null) {
+            if (result != null)
+            {
                 response(result, request, operation);
             }
-        } catch (Throwable t) {
+        }
+        catch (Throwable t)
+        {
             // make Spring security exceptions flow so that exception transformer filter can handle
             // them
             if (isSecurityException(t)) throw (Exception) t;
             exception(t, service, request);
-        } finally {
+        }
+        finally
+        {
             fireFinishedCallback(request);
             REQUEST.remove();
         }
@@ -288,31 +339,42 @@ public class Dispatcher extends AbstractController {
         return null;
     }
 
-    void flagAsSOAP(Operation op) {
-        for (Object reqObj : op.getParameters()) {
-            if (OwsUtils.has(reqObj, "formatOptions")) {
+    void flagAsSOAP(Operation op)
+    {
+        for (Object reqObj : op.getParameters())
+        {
+            if (OwsUtils.has(reqObj, "formatOptions"))
+            {
                 OwsUtils.put(reqObj, "formatOptions", "SOAP", true);
             }
-            if (OwsUtils.has(reqObj, "extendedProperties")) {
+            if (OwsUtils.has(reqObj, "extendedProperties"))
+            {
                 OwsUtils.put(reqObj, "extendedProperties", "SOAP", true);
             }
-            if (OwsUtils.has(reqObj, "metadata")) {
+            if (OwsUtils.has(reqObj, "metadata"))
+            {
                 OwsUtils.put(reqObj, "metadata", "SOAP", true);
             }
         }
     }
 
-    void fireFinishedCallback(Request req) {
-        for (DispatcherCallback cb : callbacks) {
-            try {
+    void fireFinishedCallback(Request req)
+    {
+        for (DispatcherCallback cb : callbacks)
+        {
+            try
+            {
                 cb.finished(req);
-            } catch (Throwable t) {
+            }
+            catch (Throwable t)
+            {
                 logger.log(Level.WARNING, "Error firing finished callback for " + cb.getClass(), t);
             }
         }
     }
 
-    Request init(Request request) throws ServiceException, IOException {
+    Request init(Request request) throws ServiceException, IOException
+    {
         HttpServletRequest httpRequest = request.getHttpRequest();
 
         String reqContentType = httpRequest.getContentType();
@@ -322,67 +384,99 @@ public class Dispatcher extends AbstractController {
         // create the kvp map
         parseKVP(request);
 
-        if (!request.isGet()) { // && httpRequest.getInputStream().available() > 0) {
+        if (!request.isGet())
+        { // && httpRequest.getInputStream().available() > 0) {
             // check for a SOAP request, if so we need to unwrap the SOAP stuff
             if (httpRequest.getContentType() != null
-                    && httpRequest.getContentType().startsWith(SOAP_MIME)) {
+                    && httpRequest.getContentType().startsWith(SOAP_MIME))
+            {
                 request.setSOAP(true);
                 request.setInput(soapReader(httpRequest, request));
-            } else if (reqContentType != null
-                    && ServletFileUpload.isMultipartContent(httpRequest)) {
+            }
+            else if (reqContentType != null
+                    && ServletFileUpload.isMultipartContent(httpRequest))
+            {
                 // multipart form upload
                 ServletFileUpload up = new ServletFileUpload();
                 up.setFileItemFactory(new DiskFileItemFactory());
 
                 // treat regular form fields as additional kvp parameters
                 Map<String, FileItem> kvpFileItems = new CaseInsensitiveMap(new LinkedHashMap());
-                try {
-                    for (FileItem item : (List<FileItem>) up.parseRequest(httpRequest)) {
-                        if (item.isFormField()) {
+                try
+                {
+                    for (FileItem item : (List<FileItem>) up.parseRequest(httpRequest))
+                    {
+                        if (item.isFormField())
+                        {
                             kvpFileItems.put(item.getFieldName(), item);
-                        } else {
+                        }
+                        else
+                        {
                             request.setInput(fileItemReader(item));
                         }
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     throw new ServiceException("Error handling multipart/form-data content", e);
                 }
 
                 // if no file fields were found, look for one named "body"
-                if (request.getInput() == null) {
+                if (request.getInput() == null)
+                {
                     FileItem body = kvpFileItems.get("body");
-                    if (body != null) {
+                    if (body != null)
+                    {
                         request.setInput(fileItemReader(body));
                         kvpFileItems.remove("body");
                     }
                 }
 
                 Map<String, String> kvpItems = new LinkedHashMap();
-                for (Map.Entry<String, FileItem> e : kvpFileItems.entrySet()) {
+                for (Map.Entry<String, FileItem> e : kvpFileItems.entrySet())
+                {
                     kvpItems.put(e.getKey(), e.getValue().toString());
                 }
 
                 request.setOrAppendKvp(parseKVP(request, kvpFileItems));
-            } else {
+            }
+            else
+            {
                 // regular XML POST
                 // wrap the input stream in a buffered input stream
                 request.setInput(reader(httpRequest));
             }
 
+            // 新增json解析
+            if (reqContentType != null
+                    && reqContentType.startsWith(JSON_MIME))
+            {
+                request.setJson(true);
+            }
+
+
             char[] req = new char[xmlPostRequestLogBufferSize];
             int read = request.getInput().read(req, 0, xmlPostRequestLogBufferSize);
 
-            if (logger.isLoggable(Level.FINE)) {
-                if (read == -1) {
+            if (logger.isLoggable(Level.FINE))
+            {
+                if (read == -1)
+                {
                     request.setInput(null);
-                } else if (read < xmlPostRequestLogBufferSize) {
+                }
+                else if (read < xmlPostRequestLogBufferSize)
+                {
                     logger.fine("Raw XML request: " + new String(req));
-                } else if (xmlPostRequestLogBufferSize != 0) {
+                }
+                else if (xmlPostRequestLogBufferSize != 0)
+                {
                     logger.fine("Raw XML request starts with: " + new String(req) + "...");
                 }
             }
             if (read == -1) request.setInput(null);
             else request.getInput().reset();
+
+
         }
         // parse the request path into two components. (1) the 'path' which
         // is the string after the last '/', and the 'context' which is the
@@ -392,21 +486,26 @@ public class Dispatcher extends AbstractController {
         reqPath = reqPath.substring(ctxPath.length());
 
         // strip off leading and trailing slashes
-        if (reqPath.startsWith("/")) {
+        if (reqPath.startsWith("/"))
+        {
             reqPath = reqPath.substring(1, reqPath.length());
         }
 
-        if (reqPath.endsWith("/")) {
+        if (reqPath.endsWith("/"))
+        {
             reqPath = reqPath.substring(0, reqPath.length() - 1);
         }
 
         String context = reqPath;
         String path = null;
         int index = context.lastIndexOf('/');
-        if (index != -1) {
+        if (index != -1)
+        {
             path = context.substring(index + 1);
             context = context.substring(0, index);
-        } else {
+        }
+        else
+        {
             path = reqPath;
             context = null;
         }
@@ -417,49 +516,66 @@ public class Dispatcher extends AbstractController {
         return fireInitCallback(request);
     }
 
-    private boolean isForm(String contentType) {
-        if (contentType == null) {
+    private boolean isForm(String contentType)
+    {
+        if (contentType == null)
+        {
             return false;
-        } else {
+        }
+        else
+        {
             return contentType.startsWith("application/x-www-form-urlencoded");
         }
     }
 
-    Request fireInitCallback(Request req) {
-        for (DispatcherCallback cb : callbacks) {
+    Request fireInitCallback(Request req)
+    {
+        for (DispatcherCallback cb : callbacks)
+        {
             Request r = cb.init(req);
             req = r != null ? r : req;
         }
         return req;
     }
 
-    BufferedReader soapReader(HttpServletRequest httpRequest, Request request) throws IOException {
+    BufferedReader soapReader(HttpServletRequest httpRequest, Request request) throws IOException
+    {
         // in order to pull out the payload we have to parse the entire request and then reencode it
         // not nice... but then again neither is using SOAP
         Document dom = null;
-        try {
+        try
+        {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Object provider = GeoServerExtensions.bean("entityResolverProvider");
-            if (provider != null && getEntityResolver != null) {
+            if (provider != null && getEntityResolver != null)
+            {
                 db.setEntityResolver((EntityResolver) getEntityResolver.invoke(provider));
             }
             dom = db.parse(httpRequest.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new IOException("Error parsing SOAP request", e);
         }
 
         // find the soap:Body element
         NodeList list = dom.getElementsByTagNameNS(SOAP_12_NS, "Body");
-        if (list.getLength() != 1) {
+        if (list.getLength() != 1)
+        {
             list = dom.getElementsByTagNameNS(SOAP_11_NS, "Body");
-            if (list.getLength() != 1) {
+            if (list.getLength() != 1)
+            {
                 throw new IOException("SOAP requests should specify a single Body element");
-            } else {
+            }
+            else
+            {
                 request.setSOAPNamespace(SOAP_11_NS);
             }
-        } else {
+        }
+        else
+        {
             request.setSOAPNamespace(SOAP_12_NS);
         }
 
@@ -467,24 +583,30 @@ public class Dispatcher extends AbstractController {
 
         // pull out the first element child
         Element payload = null;
-        for (int i = 0; payload == null && i < body.getChildNodes().getLength(); i++) {
+        for (int i = 0; payload == null && i < body.getChildNodes().getLength(); i++)
+        {
             Node n = body.getChildNodes().item(i);
-            if (n instanceof Element) {
+            if (n instanceof Element)
+            {
                 payload = (Element) n;
             }
         }
 
-        if (payload == null) {
+        if (payload == null)
+        {
             throw new IOException("Could not find payload in SOAP request");
         }
 
         // transform the payload back into an input stream so we can parse it as usual
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        try {
+        try
+        {
             TransformerFactory.newInstance()
                     .newTransformer()
                     .transform(new DOMSource(payload), new StreamResult(bout));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new IOException("Error encoding payload of SOAP request", e);
         }
 
@@ -492,17 +614,21 @@ public class Dispatcher extends AbstractController {
                 new ByteArrayInputStream(bout.toByteArray()), XML_LOOKAHEAD);
     }
 
-    BufferedReader reader(HttpServletRequest httpRequest) throws IOException {
+    BufferedReader reader(HttpServletRequest httpRequest) throws IOException
+    {
         return RequestUtils.getBufferedXMLReader(httpRequest.getInputStream(), XML_LOOKAHEAD);
     }
 
-    BufferedReader fileItemReader(FileItem fileItem) throws IOException {
+    BufferedReader fileItemReader(FileItem fileItem) throws IOException
+    {
         return RequestUtils.getBufferedXMLReader(fileItem.getInputStream(), XML_LOOKAHEAD);
     }
 
-    Service service(Request req) throws Exception {
+    Service service(Request req) throws Exception
+    {
         // check kvp
-        if (req.getKvp() != null) {
+        if (req.getKvp() != null)
+        {
 
             req.setService(normalize(KvpUtils.getSingleValue(req.getKvp(), "service")));
             req.setVersion(
@@ -511,21 +637,27 @@ public class Dispatcher extends AbstractController {
             req.setOutputFormat(normalize(KvpUtils.getSingleValue(req.getKvp(), "outputFormat")));
         }
         // check the body
-        if (req.getInput() != null && "POST".equalsIgnoreCase(req.getHttpRequest().getMethod())) {
+        if (req.getInput() != null && "POST".equalsIgnoreCase(req.getHttpRequest().getMethod()) && !req.isJson())
+        {
             Map xml = readOpPost(req.getInput());
-            if (xml.get("service") != null) {
+            if (xml.get("service") != null)
+            {
                 req.setService(normalize((String) xml.get("service")));
             }
-            if (xml.get("version") != null) {
+            if (xml.get("version") != null)
+            {
                 req.setVersion(normalizeVersion(normalize((String) xml.get("version"))));
             }
-            if (xml.get("request") != null) {
+            if (xml.get("request") != null)
+            {
                 req.setRequest(normalize((String) xml.get("request")));
             }
-            if (xml.get("outputFormat") != null) {
+            if (xml.get("outputFormat") != null)
+            {
                 req.setOutputFormat(normalize((String) xml.get("outputFormat")));
             }
-            if ((String) xml.get("namespace") != null) {
+            if ((String) xml.get("namespace") != null)
+            {
                 req.setNamespace(normalize((String) xml.get("namespace")));
             }
         }
@@ -536,23 +668,28 @@ public class Dispatcher extends AbstractController {
         // is often a good way to infer the service or request
         String service = req.getService();
 
-        if ((service == null) || (req.getRequest() == null)) {
+        if ((service == null) || (req.getRequest() == null))
+        {
             Map map = readOpContext(req);
 
-            if (service == null) {
+            if (service == null)
+            {
                 service = normalize((String) map.get("service"));
 
-                if ((service != null) && !citeCompliant) {
+                if ((service != null) && !citeCompliant)
+                {
                     req.setService(service);
                 }
             }
 
-            if (req.getRequest() == null) {
+            if (req.getRequest() == null)
+            {
                 req.setRequest(normalize((String) map.get("request")));
             }
         }
 
-        if (service == null) {
+        if (service == null)
+        {
             // give up
             throw new ServiceException(
                     "Could not determine service", "MissingParameterValue", "service");
@@ -560,22 +697,27 @@ public class Dispatcher extends AbstractController {
 
         // load from teh context
         Service serviceDescriptor = findService(service, req.getVersion(), req.getNamespace());
-        if (serviceDescriptor == null) {
+        if (serviceDescriptor == null)
+        {
             // hack for backwards compatability, try finding the service with the context instead
             // of the service
-            if (req.getContext() != null) {
+            if (req.getContext() != null)
+            {
                 serviceDescriptor =
                         findService(req.getContext(), req.getVersion(), req.getNamespace());
-                if (serviceDescriptor != null) {
+                if (serviceDescriptor != null)
+                {
                     // found, assume that the client is using <service>/<request>
-                    if (req.getRequest() == null) {
+                    if (req.getRequest() == null)
+                    {
                         req.setRequest(req.getService());
                     }
                     req.setService(req.getContext());
                     req.setContext(null);
                 }
             }
-            if (serviceDescriptor == null) {
+            if (serviceDescriptor == null)
+            {
                 String msg = "No service: ( " + service + " )";
                 throw new ServiceException(msg, "InvalidParameterValue", "service");
             }
@@ -584,8 +726,10 @@ public class Dispatcher extends AbstractController {
         return fireServiceDispatchedCallback(req, serviceDescriptor);
     }
 
-    Service fireServiceDispatchedCallback(Request req, Service service) {
-        for (DispatcherCallback cb : callbacks) {
+    Service fireServiceDispatchedCallback(Request req, Service service)
+    {
+        for (DispatcherCallback cb : callbacks)
+        {
             Service s = cb.serviceDispatched(req, service);
             service = s != null ? s : service;
         }
@@ -597,12 +741,15 @@ public class Dispatcher extends AbstractController {
      *
      * @return The value with whitespace trimmed, or null if this would result in an empty string.
      */
-    public static String normalize(String value) {
-        if (value == null) {
+    public static String normalize(String value)
+    {
+        if (value == null)
+        {
             return null;
         }
 
-        if ("".equals(value.trim())) {
+        if ("".equals(value.trim()))
+        {
             return null;
         }
 
@@ -614,21 +761,26 @@ public class Dispatcher extends AbstractController {
      *
      * @return normalized version
      */
-    public static String normalizeVersion(String version) {
-        if (version == null) {
+    public static String normalizeVersion(String version)
+    {
+        if (version == null)
+        {
             return null;
         }
 
         Version v = new Version(version);
-        if (v.getMajor() == null) {
+        if (v.getMajor() == null)
+        {
             return null;
         }
 
-        if (v.getMinor() == null) {
+        if (v.getMinor() == null)
+        {
             return String.format("%d.0.0", ((Number) v.getMajor()).intValue());
         }
 
-        if (v.getRevision() == null) {
+        if (v.getRevision() == null)
+        {
             return String.format(
                     "%d.%d.0",
                     ((Number) v.getMajor()).intValue(), ((Number) v.getMinor()).intValue());
@@ -638,8 +790,10 @@ public class Dispatcher extends AbstractController {
         return version;
     }
 
-    Operation dispatch(Request req, Service serviceDescriptor) throws Throwable {
-        if (req.getRequest() == null) {
+    Operation dispatch(Request req, Service serviceDescriptor) throws Throwable
+    {
+        if (req.getRequest() == null)
+        {
             String msg =
                     "Could not determine geoserver request from http request "
                             + req.getHttpRequest();
@@ -649,7 +803,8 @@ public class Dispatcher extends AbstractController {
         // ensure the requested operation exists
         boolean exists = operationExists(req, serviceDescriptor);
         // did we have a mixed kvp + post request and trusted the body for the request?
-        if (!exists && req.getKvp().get("request") != null) {
+        if (!exists && req.getKvp().get("request") != null)
+        {
             req.setRequest(normalize(KvpUtils.getSingleValue(req.getKvp(), "request")));
             exists = operationExists(req, serviceDescriptor);
         }
@@ -658,7 +813,8 @@ public class Dispatcher extends AbstractController {
         Object serviceBean = serviceDescriptor.getService();
         Method operation = OwsUtils.method(serviceBean.getClass(), req.getRequest());
 
-        if (operation == null || !exists) {
+        if (operation == null || !exists)
+        {
             String msg = "No such operation " + req;
             throw new ServiceException(msg, "OperationNotSupported", req.getRequest());
         }
@@ -666,21 +822,30 @@ public class Dispatcher extends AbstractController {
         // step 4: setup the paramters
         Object[] parameters = new Object[operation.getParameterTypes().length];
 
-        for (int i = 0; i < parameters.length; i++) {
+        for (int i = 0; i < parameters.length; i++)
+        {
             Class parameterType = operation.getParameterTypes()[i];
 
             // first check for servlet request and response
-            if (parameterType.isAssignableFrom(HttpServletRequest.class)) {
+            if (parameterType.isAssignableFrom(HttpServletRequest.class))
+            {
                 parameters[i] = req.getHttpRequest();
-            } else if (parameterType.isAssignableFrom(HttpServletResponse.class)) {
+            }
+            else if (parameterType.isAssignableFrom(HttpServletResponse.class))
+            {
                 parameters[i] = req.getHttpResponse();
             }
             // next check for input and output
-            else if (parameterType.isAssignableFrom(InputStream.class)) {
+            else if (parameterType.isAssignableFrom(InputStream.class))
+            {
                 parameters[i] = req.getHttpRequest().getInputStream();
-            } else if (parameterType.isAssignableFrom(OutputStream.class)) {
+            }
+            else if (parameterType.isAssignableFrom(OutputStream.class))
+            {
                 parameters[i] = req.getHttpResponse().getOutputStream();
-            } else {
+            }
+            else
+            {
                 // check for a request object
                 Object requestBean = null;
 
@@ -690,42 +855,61 @@ public class Dispatcher extends AbstractController {
                 // Boolean used for evaluating if the request bean has been parsed in KVP or in XML
                 boolean kvpParsed = false;
                 boolean xmlParsed = false;
+                boolean jsonParsed = false;
 
-                if (req.getKvp() != null && req.getKvp().size() > 0) {
+                if (req.getKvp() != null && req.getKvp().size() > 0)
+                {
                     // use the kvp reader mechanism
-                    try {
+                    try
+                    {
                         requestBean = parseRequestKVP(parameterType, req);
                         kvpParsed = true;
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         // dont die now, there might be a body to parse
                         t = e;
                     }
                 }
-                if (req.getInput() != null) {
+                if (req.getInput() != null && !req.isJson())
+                {
                     // use the xml reader mechanism
                     requestBean = parseRequestXML(requestBean, req.getInput(), req);
                     xmlParsed = true;
                 }
 
+                if (req.isJson())
+                {
+                    requestBean = parseRequestJson(parameterType, req.getInput());
+                    jsonParsed = true;
+                }
+
                 // if no reader found for the request, throw exception
                 // TODO: we may wish to make this configurable, as perhaps there
                 // might be cases when the service prefers that null be passed in?
-                if (requestBean == null) {
+                if (requestBean == null)
+                {
                     // unable to parse request object, throw exception if we
                     // caught one
-                    if (t != null) {
+                    if (t != null)
+                    {
                         throw t;
                     }
-                    if (kvpParsed && xmlParsed || (!kvpParsed && !xmlParsed)) {
+                    if (kvpParsed && xmlParsed || (!kvpParsed && !xmlParsed))
+                    {
                         throw new ServiceException(
                                 "Could not find request reader (either kvp or xml) for: "
                                         + parameterType.getName()
                                         + ", it might be that some request parameters are missing, "
                                         + "please check the documentation");
-                    } else if (kvpParsed) {
+                    }
+                    else if (kvpParsed)
+                    {
                         throw new ServiceException(
                                 "Could not parse the KVP for: " + parameterType.getName());
-                    } else {
+                    }
+                    else
+                    {
                         throw new ServiceException(
                                 "Could not parse the XML for: " + parameterType.getName());
                     }
@@ -734,10 +918,11 @@ public class Dispatcher extends AbstractController {
                 // GEOS-934  and GEOS-1288
                 Method setBaseUrl =
                         OwsUtils.setter(requestBean.getClass(), "baseUrl", String.class);
-                if (setBaseUrl != null) {
+                if (setBaseUrl != null)
+                {
                     setBaseUrl.invoke(
                             requestBean,
-                            new String[] {ResponseUtils.baseURL(req.getHttpRequest())});
+                            new String[]{ResponseUtils.baseURL(req.getHttpRequest())});
                 }
 
                 // another couple of thos of those lovley cite things, version+service has to
@@ -745,19 +930,23 @@ public class Dispatcher extends AbstractController {
                 // non capabilities request, so if we dont have either thus far, check the request
                 // objects to try and find one
                 // TODO: should make this configurable
-                if (requestBean != null) {
+                if (requestBean != null)
+                {
                     // if we dont have a version thus far, check the request object
-                    if (req.getService() == null) {
+                    if (req.getService() == null)
+                    {
                         req.setService(lookupRequestBeanProperty(requestBean, "service", false));
                     }
 
-                    if (req.getVersion() == null) {
+                    if (req.getVersion() == null)
+                    {
                         req.setVersion(
                                 normalizeVersion(
                                         lookupRequestBeanProperty(requestBean, "version", false)));
                     }
 
-                    if (req.getOutputFormat() == null) {
+                    if (req.getOutputFormat() == null)
+                    {
                         req.setOutputFormat(
                                 lookupRequestBeanProperty(requestBean, "outputFormat", true));
                     }
@@ -770,16 +959,22 @@ public class Dispatcher extends AbstractController {
         // if we are in cite compliant mode, do some additional checks to make
         // sure the "mandatory" parameters are specified, even though we
         // succesfully dispatched the request.
-        if (citeCompliant) {
+        if (citeCompliant)
+        {
             // the version is mandatory for all requests but GetCapabilities
-            if (!"GetCapabilities".equalsIgnoreCase(req.getRequest())) {
-                if (req.getVersion() == null) {
+            if (!"GetCapabilities".equalsIgnoreCase(req.getRequest()))
+            {
+                if (req.getVersion() == null)
+                {
                     // must be a version on non-capabilities requests
                     throw new ServiceException(
                             "Could not determine version", "MissingParameterValue", "version");
-                } else {
+                }
+                else
+                {
                     // version must be valid
-                    if (!req.getVersion().matches("[0-99].[0-99].[0-99]")) {
+                    if (!req.getVersion().matches("[0-99].[0-99].[0-99]"))
+                    {
                         throw new ServiceException(
                                 "Invalid version: " + req.getVersion(),
                                 "InvalidParameterValue",
@@ -790,17 +985,20 @@ public class Dispatcher extends AbstractController {
                     boolean found = false;
                     Version version = new Version(req.getVersion());
 
-                    for (Iterator s = loadServices().iterator(); s.hasNext(); ) {
+                    for (Iterator s = loadServices().iterator(); s.hasNext(); )
+                    {
                         Service service = (Service) s.next();
 
-                        if (version.equals(service.getVersion())) {
+                        if (version.equals(service.getVersion()))
+                        {
                             found = true;
 
                             break;
                         }
                     }
 
-                    if (!found) {
+                    if (!found)
+                    {
                         throw new ServiceException(
                                 "Invalid version: " + req.getVersion(),
                                 "InvalidParameterValue",
@@ -810,7 +1008,8 @@ public class Dispatcher extends AbstractController {
             }
 
             // the service is mandatory for all requests instead
-            if (req.getService() == null) {
+            if (req.getService() == null)
+            {
                 // give up
                 throw new ServiceException(
                         "Could not determine service", "MissingParameterValue", "service");
@@ -821,10 +1020,52 @@ public class Dispatcher extends AbstractController {
         return fireOperationDispatchedCallback(req, op);
     }
 
-    private boolean operationExists(Request req, Service serviceDescriptor) {
+    /**
+     * 将流转换成json
+     *
+     * @param parameterType
+     * @param input
+     * @return
+     */
+    private Object parseRequestJson(Class parameterType, BufferedReader input)
+    {
+        String json = ReadAsChars(input);
+        return JSONArray.parseObject(json, parameterType);
+    }
+
+    /**
+     * 读取流
+     *
+     * @param request
+     * @return
+     */
+    public String ReadAsChars(BufferedReader request)
+    {
+
+        StringBuilder sb = new StringBuilder("");
+        try
+        {
+            String str;
+            while ((str = request.readLine()) != null)
+            {
+                sb.append(str);
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+    }
+
+    private boolean operationExists(Request req, Service serviceDescriptor)
+    {
         boolean exists = false;
-        for (String op : serviceDescriptor.getOperations()) {
-            if (op.equalsIgnoreCase(req.getRequest())) {
+        for (String op : serviceDescriptor.getOperations())
+        {
+            if (op.equalsIgnoreCase(req.getRequest()))
+            {
                 exists = true;
                 break;
             }
@@ -832,8 +1073,10 @@ public class Dispatcher extends AbstractController {
         return exists;
     }
 
-    Operation fireOperationDispatchedCallback(Request req, Operation op) {
-        for (DispatcherCallback cb : callbacks) {
+    Operation fireOperationDispatchedCallback(Request req, Operation op)
+    {
+        for (DispatcherCallback cb : callbacks)
+        {
             Operation o = cb.operationDispatched(req, op);
             op = o != null ? o : op;
         }
@@ -841,20 +1084,26 @@ public class Dispatcher extends AbstractController {
     }
 
     String lookupRequestBeanProperty(
-            Object requestBean, String property, boolean allowDefaultValues) {
-        if (requestBean instanceof EObject && EMFUtils.has((EObject) requestBean, property)) {
+            Object requestBean, String property, boolean allowDefaultValues)
+    {
+        if (requestBean instanceof EObject && EMFUtils.has((EObject) requestBean, property))
+        {
             // special case hack for eObject, we should move
             // this out into an extension ppint
             EObject eObject = (EObject) requestBean;
 
-            if (allowDefaultValues || EMFUtils.isSet(eObject, property)) {
+            if (allowDefaultValues || EMFUtils.isSet(eObject, property))
+            {
                 return normalize((String) EMFUtils.get(eObject, property));
             }
-        } else {
+        }
+        else
+        {
             // straight reflection
             String version = (String) OwsUtils.property(requestBean, property, String.class);
 
-            if (version != null) {
+            if (version != null)
+            {
                 return normalize(version);
             }
         }
@@ -862,7 +1111,8 @@ public class Dispatcher extends AbstractController {
         return null;
     }
 
-    Object execute(Request req, Operation opDescriptor) throws Throwable {
+    Object execute(Request req, Operation opDescriptor) throws Throwable
+    {
         Service serviceDescriptor = opDescriptor.getService();
         Object serviceBean = serviceDescriptor.getService();
         Object[] parameters = opDescriptor.getParameters();
@@ -870,8 +1120,10 @@ public class Dispatcher extends AbstractController {
         // step 5: execute
         Object result = null;
 
-        try {
-            if (serviceBean instanceof DirectInvocationService) {
+        try
+        {
+            if (serviceBean instanceof DirectInvocationService)
+            {
                 // invokeDirect expects the operation to be called as declared in the operation
                 // descriptor, although it used to match a method name, lets use the declared
                 // operation name for contract compliance.
@@ -879,17 +1131,18 @@ public class Dispatcher extends AbstractController {
                 result =
                         ((DirectInvocationService) serviceBean)
                                 .invokeDirect(operationName, parameters);
-            } else {
+            }
+            else
+            {
                 Method operation = opDescriptor.getMethod();
-                /**
-                 * 通过反射调用具体的执行方法
-                 * serviceBean 为具体的执行方能发
-                 * parameters 为通过kvp解析器解析出来的具体的封装类集合
-                 */
+                /** 通过反射调用具体的执行方法 serviceBean 为具体的执行方能发 parameters 为通过kvp解析器解析出来的具体的封装类集合 */
                 result = operation.invoke(serviceBean, parameters);
             }
-        } catch (Exception e) {
-            if (e.getCause() != null) {
+        }
+        catch (Exception e)
+        {
+            if (e.getCause() != null)
+            {
                 throw e.getCause();
             }
             throw e;
@@ -898,29 +1151,35 @@ public class Dispatcher extends AbstractController {
         return fireOperationExecutedCallback(req, opDescriptor, result);
     }
 
-    Object fireOperationExecutedCallback(Request req, Operation op, Object result) {
-        for (DispatcherCallback cb : callbacks) {
+    Object fireOperationExecutedCallback(Request req, Operation op, Object result)
+    {
+        for (DispatcherCallback cb : callbacks)
+        {
             Object r = cb.operationExecuted(req, op, result);
             result = r != null ? r : result;
         }
         return result;
     }
 
-    void response(Object result, Request req, Operation opDescriptor) throws Throwable {
+    void response(Object result, Request req, Operation opDescriptor) throws Throwable
+    {
         // step 6: write response
-        if (result != null) {
+        if (result != null)
+        {
             // look up respones
             List responses = GeoServerExtensions.extensions(Response.class);
 
             // first filter by binding, and canHandle
             O:
-            for (Iterator itr = responses.iterator(); itr.hasNext(); ) {
+            for (Iterator itr = responses.iterator(); itr.hasNext(); )
+            {
                 Response response = (Response) itr.next();
 
                 Class binding = response.getBinding();
 
                 if (!binding.isAssignableFrom(result.getClass())
-                        || !response.canHandle(opDescriptor)) {
+                        || !response.canHandle(opDescriptor))
+                {
                     itr.remove();
 
                     continue;
@@ -931,12 +1190,15 @@ public class Dispatcher extends AbstractController {
 
                 if ((req.getOutputFormat() != null)
                         && (!outputFormats.isEmpty())
-                        && !outputFormats.contains(req.getOutputFormat())) {
+                        && !outputFormats.contains(req.getOutputFormat()))
+                {
 
                     // must do a case insensitive check
-                    for (Iterator of = outputFormats.iterator(); of.hasNext(); ) {
+                    for (Iterator of = outputFormats.iterator(); of.hasNext(); )
+                    {
                         String outputFormat = (String) of.next();
-                        if (req.getOutputFormat().equalsIgnoreCase(outputFormat)) {
+                        if (req.getOutputFormat().equalsIgnoreCase(outputFormat))
+                        {
                             continue O;
                         }
                     }
@@ -945,16 +1207,21 @@ public class Dispatcher extends AbstractController {
                 }
             }
 
-            if (responses.isEmpty()) {
-                if (req.getOutputFormat() != null) {
+            if (responses.isEmpty())
+            {
+                if (req.getOutputFormat() != null)
+                {
                     throw new ServiceException(
                             "Failed to find response for output format " + req.getOutputFormat(),
                             ServiceException.INVALID_PARAMETER_VALUE,
                             "outputFormat");
-                } else {
+                }
+                else
+                {
                     String msg = "No response: ( object = " + result.getClass();
 
-                    if (req.getOutputFormat() != null) {
+                    if (req.getOutputFormat() != null)
+                    {
                         msg += (", outputFormat = " + req.getOutputFormat());
                     }
 
@@ -964,20 +1231,25 @@ public class Dispatcher extends AbstractController {
                 }
             }
 
-            if (responses.size() > 1) {
+            if (responses.size() > 1)
+            {
                 // sort by class hierarchy
                 Collections.sort(
                         responses,
-                        new Comparator() {
-                            public int compare(Object o1, Object o2) {
+                        new Comparator()
+                        {
+                            public int compare(Object o1, Object o2)
+                            {
                                 Class c1 = ((Response) o1).getBinding();
                                 Class c2 = ((Response) o2).getBinding();
 
-                                if (c1.equals(c2)) {
+                                if (c1.equals(c2))
+                                {
                                     return 0;
                                 }
 
-                                if (c1.isAssignableFrom(c2)) {
+                                if (c1.isAssignableFrom(c2))
+                                {
                                     return 1;
                                 }
 
@@ -989,7 +1261,8 @@ public class Dispatcher extends AbstractController {
                 Response r1 = (Response) responses.get(0);
                 Response r2 = (Response) responses.get(1);
 
-                if (r1.getBinding().equals(r2.getBinding())) {
+                if (r1.getBinding().equals(r2.getBinding()))
+                {
                     String msg =
                             "Multiple responses: (" + result.getClass() + "): " + r1 + ", " + r2;
                     throw new RuntimeException(msg);
@@ -1002,7 +1275,8 @@ public class Dispatcher extends AbstractController {
             // load the output strategy to be used
             ServiceStrategy outputStrategy = findOutputStrategy(req.getHttpResponse());
 
-            if (outputStrategy == null) {
+            if (outputStrategy == null)
+            {
                 outputStrategy = new DefaultOutputStrategy();
             }
 
@@ -1010,15 +1284,19 @@ public class Dispatcher extends AbstractController {
             String mimeType = response.getMimeType(result, opDescriptor);
 
             // check for SOAP request
-            if (req.isSOAP()) {
+            if (req.isSOAP())
+            {
                 req.getHttpResponse().setContentType(SOAP_MIME);
-            } else {
+            }
+            else
+            {
                 req.getHttpResponse().setContentType(mimeType);
             }
 
             // set the charset
             String charset = response.getCharset(opDescriptor);
-            if (charset != null) {
+            if (charset != null)
+            {
                 req.getHttpResponse().setCharacterEncoding(charset);
             }
 
@@ -1027,56 +1305,69 @@ public class Dispatcher extends AbstractController {
             @SuppressWarnings("PMD.CloseResource") // managed by the output strategy
             OutputStream output = outputStrategy.getDestination(req.getHttpResponse());
             boolean abortResponse = true;
-            try {
-                if (req.isSOAP()) {
+            try
+            {
+                if (req.isSOAP())
+                {
                     // SOAP request, start the SOAP wrapper
                     startSOAPEnvelope(output, req, response);
                 }
 
                 // special check for transformer
-                if (req.isSOAP() && result instanceof TransformerBase) {
+                if (req.isSOAP() && result instanceof TransformerBase)
+                {
                     ((TransformerBase) result).setOmitXMLDeclaration(true);
                 }
 
                 // actually write out the response
                 response.write(result, output, opDescriptor);
 
-                if (req.isSOAP()) {
+                if (req.isSOAP())
+                {
                     // SOAP request, start the SOAP wrapper
                     endSOAPEnvelope(output);
                 }
 
                 // flush the output with detection of client shutting the door in our face
-                try {
+                try
+                {
                     outputStrategy.flush(req.getHttpResponse());
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     throw new ClientStreamAbortedException(e);
                 }
                 abortResponse = true;
-            } finally {
-                if (abortResponse) {
+            }
+            finally
+            {
+                if (abortResponse)
+                {
                     outputStrategy.abort();
                 }
             }
-
             // flush the underlying out stream for good measure
             req.getHttpResponse().getOutputStream().flush();
         }
     }
 
-    void setHeaders(Request req, Operation opDescriptor, Object result, Response response) {
+    void setHeaders(Request req, Operation opDescriptor, Object result, Response response)
+    {
         // get the basics using the new api
         Map rawKvp = req.getRawKvp();
         String disposition = response.getPreferredDisposition(result, opDescriptor);
         String filename = response.getAttachmentFileName(result, opDescriptor);
 
         // get user overrides, if any
-        if (rawKvp != null) {
+        if (rawKvp != null)
+        {
             // check if the filename and content disposition were provided
-            if (rawKvp.get("FILENAME") != null) {
+            if (rawKvp.get("FILENAME") != null)
+            {
                 filename = (String) rawKvp.get("FILENAME");
             }
-            if (rawKvp.get("CONTENT-DISPOSITION") != null) {
+            if (rawKvp.get("CONTENT-DISPOSITION") != null)
+            {
                 disposition = (String) rawKvp.get("CONTENT-DISPOSITION");
             }
         }
@@ -1085,21 +1376,28 @@ public class Dispatcher extends AbstractController {
         // check and prevent invalid header injection
         if (disposition != null
                 && !Response.DISPOSITION_ATTACH.equals(disposition)
-                && !Response.DISPOSITION_INLINE.equals(disposition)) {
+                && !Response.DISPOSITION_INLINE.equals(disposition))
+        {
             disposition = null;
         }
 
         // set any extra headers, other than the mime-type
         String[][] headers = response.getHeaders(result, opDescriptor);
         boolean contentDispositionProvided = false;
-        if (headers != null) {
-            for (int i = 0; i < headers.length; i++) {
-                if (headers[i][0].equalsIgnoreCase("Content-Disposition")) {
+        if (headers != null)
+        {
+            for (int i = 0; i < headers.length; i++)
+            {
+                if (headers[i][0].equalsIgnoreCase("Content-Disposition"))
+                {
                     contentDispositionProvided = true;
-                    if (disposition == null) {
+                    if (disposition == null)
+                    {
                         req.getHttpResponse().addHeader(headers[i][0], headers[i][1]);
                     }
-                } else {
+                }
+                else
+                {
                     req.getHttpResponse().addHeader(headers[i][0], headers[i][1]);
                 }
             }
@@ -1107,8 +1405,10 @@ public class Dispatcher extends AbstractController {
 
         // default disposition value and set if not forced by the user and not set
         // directly by the response
-        if (!contentDispositionProvided) {
-            if (disposition == null) {
+        if (!contentDispositionProvided)
+        {
+            if (disposition == null)
+            {
                 disposition = Response.DISPOSITION_INLINE;
             }
 
@@ -1116,40 +1416,50 @@ public class Dispatcher extends AbstractController {
             String disp = disposition + "; filename=" + filename;
             req.getHttpResponse().setHeader("Content-Disposition", disp);
         }
+        req.getHttpResponse().setHeader("Content-type", "text/html;charset=UTF-8");
+
     }
 
     void startSOAPEnvelope(OutputStream output, Request request, Response response)
-            throws IOException {
+            throws IOException
+    {
         output.write(
                 ("<soap:Envelope xmlns:soap='" + request.getSOAPNamespace() + "'><soap:Header/>")
                         .getBytes());
         output.write("<soap:Body".getBytes());
-        if (response != null && response instanceof SOAPAwareResponse) {
+        if (response != null && response instanceof SOAPAwareResponse)
+        {
             String type = ((SOAPAwareResponse) response).getBodyType();
-            if (type != null) {
+            if (type != null)
+            {
                 output.write((" type='" + type + "'").getBytes());
             }
         }
         output.write(">".getBytes());
     }
 
-    void endSOAPEnvelope(OutputStream output) throws IOException {
+    void endSOAPEnvelope(OutputStream output) throws IOException
+    {
         output.write(("</soap:Body></soap:Envelope>").getBytes());
     }
 
     Response fireResponseDispatchedCallback(
-            Request req, Operation op, Object result, Response response) {
-        for (DispatcherCallback cb : callbacks) {
+            Request req, Operation op, Object result, Response response)
+    {
+        for (DispatcherCallback cb : callbacks)
+        {
             Response r = cb.responseDispatched(req, op, result, response);
             response = r != null ? r : response;
         }
         return response;
     }
 
-    Collection loadServices() {
+    Collection loadServices()
+    {
         Collection services = GeoServerExtensions.extensions(Service.class);
 
-        if (!(new HashSet(services).size() == services.size())) {
+        if (!(new HashSet(services).size() == services.size()))
+        {
             String msg = "Two identical service descriptors found";
             throw new IllegalStateException(msg);
         }
@@ -1157,52 +1467,62 @@ public class Dispatcher extends AbstractController {
         return services;
     }
 
-    Service findService(String id, String ver, String namespace) throws ServiceException {
+    Service findService(String id, String ver, String namespace) throws ServiceException
+    {
         Version version = (ver != null) ? new Version(ver) : null;
         Collection services = loadServices();
 
         // the id is actually the pathinfo, in case workspace specific services
         // are active we want to skip the workspace part in the path and go directly to the
         // servlet, which normally, if we ended up here, is a reflector (wms/kml)
-        if (id.contains("/")) {
+        if (id.contains("/"))
+        {
             id = id.substring(id.indexOf("/") + 1);
         }
 
         // first just match on service,request
         List matches = new ArrayList();
 
-        for (Iterator itr = services.iterator(); itr.hasNext(); ) {
+        for (Iterator itr = services.iterator(); itr.hasNext(); )
+        {
             Service sBean = (Service) itr.next();
 
-            if (sBean.getId().equalsIgnoreCase(id)) {
+            if (sBean.getId().equalsIgnoreCase(id))
+            {
                 matches.add(sBean);
             }
         }
 
-        if (matches.isEmpty()) {
+        if (matches.isEmpty())
+        {
             return null;
         }
 
         Service sBean = null;
 
         // if multiple, use version to filter match
-        if (matches.size() > 1) {
+        if (matches.size() > 1)
+        {
             List vmatches = new ArrayList(matches);
 
             // match up the version
-            if (version != null) {
+            if (version != null)
+            {
                 // version specified, look for a match
-                for (Iterator itr = vmatches.iterator(); itr.hasNext(); ) {
+                for (Iterator itr = vmatches.iterator(); itr.hasNext(); )
+                {
                     Service s = (Service) itr.next();
 
-                    if (version.equals(s.getVersion())) {
+                    if (version.equals(s.getVersion()))
+                    {
                         continue;
                     }
 
                     itr.remove();
                 }
 
-                if (vmatches.isEmpty()) {
+                if (vmatches.isEmpty())
+                {
                     // no matching version found, drop out and next step
                     // will sort to return highest version
                     vmatches = new ArrayList(matches);
@@ -1210,28 +1530,35 @@ public class Dispatcher extends AbstractController {
             }
 
             // if still multiple matches use namespace, if available, to filter
-            if (namespace != null && vmatches.size() > 1) {
+            if (namespace != null && vmatches.size() > 1)
+            {
                 List nmatches = new ArrayList(vmatches);
-                for (Iterator itr = nmatches.iterator(); itr.hasNext(); ) {
+                for (Iterator itr = nmatches.iterator(); itr.hasNext(); )
+                {
                     Service s = (Service) itr.next();
-                    if (s.getNamespace() != null && !s.getNamespace().equals(namespace)) {
+                    if (s.getNamespace() != null && !s.getNamespace().equals(namespace))
+                    {
                         // service declares namespace, kick it out if there is no match, otherwise
                         // leave it along
                         itr.remove();
                     }
                 }
 
-                if (!nmatches.isEmpty()) {
+                if (!nmatches.isEmpty())
+                {
                     vmatches = nmatches;
                 }
             }
 
             // multiple services found, sort by version
-            if (vmatches.size() > 1) {
+            if (vmatches.size() > 1)
+            {
                 // use highest version
                 Comparator comparator =
-                        new Comparator() {
-                            public int compare(Object o1, Object o2) {
+                        new Comparator()
+                        {
+                            public int compare(Object o1, Object o2)
+                            {
                                 Service s1 = (Service) o1;
                                 Service s2 = (Service) o2;
 
@@ -1243,7 +1570,9 @@ public class Dispatcher extends AbstractController {
             }
 
             sBean = (Service) vmatches.get(vmatches.size() - 1);
-        } else {
+        }
+        else
+        {
             // only a single match, that was easy
             sBean = (Service) matches.get(0);
         }
@@ -1251,10 +1580,12 @@ public class Dispatcher extends AbstractController {
         return sBean;
     }
 
-    public static Collection loadKvpRequestReaders() {
+    public static Collection loadKvpRequestReaders()
+    {
         Collection kvpReaders = GeoServerExtensions.extensions(KvpRequestReader.class);
 
-        if (!(new HashSet(kvpReaders).size() == kvpReaders.size())) {
+        if (!(new HashSet(kvpReaders).size() == kvpReaders.size()))
+        {
             String msg = "Two identical kvp readers found";
             throw new IllegalStateException(msg);
         }
@@ -1262,32 +1593,40 @@ public class Dispatcher extends AbstractController {
         return kvpReaders;
     }
 
-    public static KvpRequestReader findKvpRequestReader(Class type) {
+    public static KvpRequestReader findKvpRequestReader(Class type)
+    {
         Collection kvpReaders = loadKvpRequestReaders();
 
         List matches = new ArrayList();
 
-        for (Iterator itr = kvpReaders.iterator(); itr.hasNext(); ) {
+        for (Iterator itr = kvpReaders.iterator(); itr.hasNext(); )
+        {
             KvpRequestReader kvpReader = (KvpRequestReader) itr.next();
 
-            if (kvpReader.getRequestBean().isAssignableFrom(type)) {
+            if (kvpReader.getRequestBean().isAssignableFrom(type))
+            {
                 matches.add(kvpReader);
             }
         }
 
-        if (matches.isEmpty()) {
+        if (matches.isEmpty())
+        {
             return null;
         }
 
-        if (matches.size() > 1) {
+        if (matches.size() > 1)
+        {
             // sort by class hierarchy
             Comparator comparator =
-                    new Comparator() {
-                        public int compare(Object o1, Object o2) {
+                    new Comparator()
+                    {
+                        public int compare(Object o1, Object o2)
+                        {
                             KvpRequestReader kvp1 = (KvpRequestReader) o1;
                             KvpRequestReader kvp2 = (KvpRequestReader) o2;
 
-                            if (kvp2.getRequestBean().isAssignableFrom(kvp1.getRequestBean())) {
+                            if (kvp2.getRequestBean().isAssignableFrom(kvp1.getRequestBean()))
+                            {
                                 return -1;
                             }
 
@@ -1301,17 +1640,22 @@ public class Dispatcher extends AbstractController {
         return (KvpRequestReader) matches.get(0);
     }
 
-    static Collection loadXmlReaders() {
+    static Collection loadXmlReaders()
+    {
         List<XmlRequestReader> xmlReaders = GeoServerExtensions.extensions(XmlRequestReader.class);
 
-        if (!(new HashSet<XmlRequestReader>(xmlReaders).size() == xmlReaders.size())) {
+        if (!(new HashSet<XmlRequestReader>(xmlReaders).size() == xmlReaders.size()))
+        {
 
             String msg = "Two identical xml readers found";
-            for (int i = 0; i < xmlReaders.size(); i++) {
+            for (int i = 0; i < xmlReaders.size(); i++)
+            {
                 XmlRequestReader r1 = xmlReaders.get(i);
-                for (int j = i + 1; j < xmlReaders.size(); j++) {
+                for (int j = i + 1; j < xmlReaders.size(); j++)
+                {
                     XmlRequestReader r2 = xmlReaders.get(j);
-                    if (r1.equals(r2)) {
+                    if (r1.equals(r2))
+                    {
                         msg += ": " + r1 + " and " + r2;
                         break;
                     }
@@ -1329,53 +1673,64 @@ public class Dispatcher extends AbstractController {
      * details
      *
      * @param namespace The XML namespace of the request body
-     * @param element The OWS request, e.g. "GetMap"
+     * @param element   The OWS request, e.g. "GetMap"
      * @param serviceId The OWS service, e.g. "WMS"
-     * @param ver The OWS service version, e.g "1.1.1"
+     * @param ver       The OWS service version, e.g "1.1.1"
      * @return An {@link XmlRequestReader} capable of reading the request body
      */
     public static XmlRequestReader findXmlReader(
-            String namespace, String element, String serviceId, String ver) {
+            String namespace, String element, String serviceId, String ver)
+    {
         Collection xmlReaders = loadXmlReaders();
 
         // first just match on namespace, element
         List matches = new ArrayList();
 
-        for (Iterator itr = xmlReaders.iterator(); itr.hasNext(); ) {
+        for (Iterator itr = xmlReaders.iterator(); itr.hasNext(); )
+        {
             XmlRequestReader xmlReader = (XmlRequestReader) itr.next();
             QName xmlElement = xmlReader.getElement();
 
-            if (xmlElement.getLocalPart().equalsIgnoreCase(element)) {
-                if (xmlElement.getNamespaceURI().equalsIgnoreCase(namespace)) {
+            if (xmlElement.getLocalPart().equalsIgnoreCase(element))
+            {
+                if (xmlElement.getNamespaceURI().equalsIgnoreCase(namespace))
+                {
                     matches.add(xmlReader);
                 }
             }
         }
 
-        if (matches.isEmpty()) {
+        if (matches.isEmpty())
+        {
             // do a more lax serach, search only on the element name if the
             // namespace was unspecified
-            if (namespace == null || namespace.equals("")) {
+            if (namespace == null || namespace.equals(""))
+            {
                 String msg =
                         "No namespace specified in request, searching for "
                                 + " xml reader by element name only";
                 logger.info(msg);
 
-                for (Iterator itr = xmlReaders.iterator(); itr.hasNext(); ) {
+                for (Iterator itr = xmlReaders.iterator(); itr.hasNext(); )
+                {
                     XmlRequestReader xmlReader = (XmlRequestReader) itr.next();
-                    if (xmlReader.getElement().getLocalPart().equals(element)) {
+                    if (xmlReader.getElement().getLocalPart().equals(element))
+                    {
                         matches.add(xmlReader);
                     }
                 }
 
-                if (!matches.isEmpty()) {
+                if (!matches.isEmpty())
+                {
                     // we found some matches, make sure they are all in the
                     // same service
                     Iterator itr = matches.iterator();
                     XmlRequestReader first = (XmlRequestReader) itr.next();
-                    while (itr.hasNext()) {
+                    while (itr.hasNext())
+                    {
                         XmlRequestReader xmlReader = (XmlRequestReader) itr.next();
-                        if (!first.getServiceId().equals(xmlReader.getServiceId())) {
+                        if (!first.getServiceId().equals(xmlReader.getServiceId()))
+                        {
                             // abort
                             matches.clear();
                             break;
@@ -1385,7 +1740,8 @@ public class Dispatcher extends AbstractController {
             }
         }
 
-        if (matches.isEmpty()) {
+        if (matches.isEmpty())
+        {
             String msg = "No xml reader: (" + namespace + "," + element + ")";
             logger.info(msg);
             return null;
@@ -1394,15 +1750,19 @@ public class Dispatcher extends AbstractController {
         XmlRequestReader xmlReader = null;
 
         // if multiple, use version to filter match
-        if (matches.size() > 1) {
+        if (matches.size() > 1)
+        {
             List vmatches = new ArrayList(matches);
 
             // match up the service
-            if (serviceId != null) {
-                for (Iterator itr = vmatches.iterator(); itr.hasNext(); ) {
+            if (serviceId != null)
+            {
+                for (Iterator itr = vmatches.iterator(); itr.hasNext(); )
+                {
                     XmlRequestReader r = (XmlRequestReader) itr.next();
 
-                    if (r.getServiceId() == null || serviceId.equalsIgnoreCase(r.getServiceId())) {
+                    if (r.getServiceId() == null || serviceId.equalsIgnoreCase(r.getServiceId()))
+                    {
                         continue;
                     }
 
@@ -1415,22 +1775,26 @@ public class Dispatcher extends AbstractController {
             }
 
             // match up the version
-            if (ver != null) {
+            if (ver != null)
+            {
                 Version version = new Version(ver);
 
                 // version specified, look for a match (and allow version
                 // generic ones to live by)
-                for (Iterator itr = vmatches.iterator(); itr.hasNext(); ) {
+                for (Iterator itr = vmatches.iterator(); itr.hasNext(); )
+                {
                     XmlRequestReader r = (XmlRequestReader) itr.next();
 
-                    if (r.getVersion() == null || version.equals(r.getVersion())) {
+                    if (r.getVersion() == null || version.equals(r.getVersion()))
+                    {
                         continue;
                     }
 
                     itr.remove();
                 }
 
-                if (vmatches.isEmpty()) {
+                if (vmatches.isEmpty())
+                {
                     // no matching version found, drop out and next step
                     // will sort to return highest version
                     vmatches = new ArrayList(matches);
@@ -1438,47 +1802,57 @@ public class Dispatcher extends AbstractController {
             }
 
             // multiple readers found, sort by version and by service match
-            if (vmatches.size() > 1) {
+            if (vmatches.size() > 1)
+            {
                 // use highest version
                 Comparator comparator =
-                        new Comparator() {
-                            public int compare(Object o1, Object o2) {
+                        new Comparator()
+                        {
+                            public int compare(Object o1, Object o2)
+                            {
                                 XmlRequestReader r1 = (XmlRequestReader) o1;
                                 XmlRequestReader r2 = (XmlRequestReader) o2;
 
                                 Version v1 = r1.getVersion();
                                 Version v2 = r2.getVersion();
 
-                                if ((v1 == null) && (v2 == null)) {
+                                if ((v1 == null) && (v2 == null))
+                                {
                                     return 0;
                                 }
 
-                                if ((v1 != null) && (v2 == null)) {
+                                if ((v1 != null) && (v2 == null))
+                                {
                                     return 1;
                                 }
 
-                                if ((v1 == null) && (v2 != null)) {
+                                if ((v1 == null) && (v2 != null))
+                                {
                                     return -1;
                                 }
 
                                 int versionCompare = v1.compareTo(v2);
 
-                                if (versionCompare != 0) {
+                                if (versionCompare != 0)
+                                {
                                     return versionCompare;
                                 }
 
                                 String sid1 = r1.getServiceId();
                                 String sid2 = r2.getServiceId();
 
-                                if ((sid1 == null) && (sid2 == null)) {
+                                if ((sid1 == null) && (sid2 == null))
+                                {
                                     return 0;
                                 }
 
-                                if ((sid1 != null) && (sid2 == null)) {
+                                if ((sid1 != null) && (sid2 == null))
+                                {
                                     return 1;
                                 }
 
-                                if ((sid1 == null) && (sid2 != null)) {
+                                if ((sid1 == null) && (sid2 != null))
+                                {
                                     return -1;
                                 }
 
@@ -1491,7 +1865,9 @@ public class Dispatcher extends AbstractController {
 
             if (vmatches.size() > 0)
                 xmlReader = (XmlRequestReader) vmatches.get(vmatches.size() - 1);
-        } else {
+        }
+        else
+        {
             // only a single match, that was easy
             xmlReader = (XmlRequestReader) matches.get(0);
         }
@@ -1499,27 +1875,34 @@ public class Dispatcher extends AbstractController {
         return xmlReader;
     }
 
-    ServiceStrategy findOutputStrategy(HttpServletResponse response) {
+    ServiceStrategy findOutputStrategy(HttpServletResponse response)
+    {
         OutputStrategyFactory factory = null;
-        try {
+        try
+        {
             factory = (OutputStrategyFactory) GeoServerExtensions.bean("serviceStrategyFactory");
-        } catch (NoSuchBeanDefinitionException e) {
+        }
+        catch (NoSuchBeanDefinitionException e)
+        {
             return null;
         }
         return factory.createOutputStrategy(response);
     }
 
-    BufferedInputStream input(File cache) throws IOException {
+    BufferedInputStream input(File cache) throws IOException
+    {
         return (cache == null) ? null : new BufferedInputStream(new FileInputStream(cache));
     }
 
-    void preParseKVP(Request req) throws ServiceException {
+    void preParseKVP(Request req) throws ServiceException
+    {
         HttpServletRequest request = req.getHttpRequest();
 
         // unparsed kvp set
         Map kvp = request.getParameterMap();
 
-        if (kvp == null || kvp.isEmpty()) {
+        if (kvp == null || kvp.isEmpty())
+        {
             req.setKvp(new HashMap());
             // req.kvp = null;
             return;
@@ -1533,37 +1916,43 @@ public class Dispatcher extends AbstractController {
         req.setRawKvp(rawKvp);
     }
 
-    void parseKVP(Request req) throws ServiceException {
+    void parseKVP(Request req) throws ServiceException
+    {
         preParseKVP(req);
         parseKVP(req, req.getKvp());
     }
 
-    Map parseKVP(Request req, Map kvp) {
+    Map parseKVP(Request req, Map kvp)
+    {
         List<Throwable> errors = KvpUtils.parse(kvp);
-        if (!errors.isEmpty()) {
+        if (!errors.isEmpty())
+        {
             req.setError(errors.get(0));
         }
         return kvp;
     }
 
     /**
-     * 将Request即http请求过来数据
-     * 通过不同的KvpRequestReader 解析成相应的 request类
+     * 将Request即http请求过来数据 通过不同的KvpRequestReader 解析成相应的 request类
      *
-     * 例如 wms.getMap 请求，通过GetMapKvpRequestReader 将请求中的信息封装成GetMapRequest
-     *          GetMapRequest 中即包含了从内存（CatalogInfoLookup 中的map 在GeoServerLoader 时加载）中读取  layers styles信息
+     * <p>例如 wms.getMap 请求，通过GetMapKvpRequestReader 将请求中的信息封装成GetMapRequest GetMapRequest
+     * 中即包含了从内存（CatalogInfoLookup 中的map 在GeoServerLoader 时加载）中读取 layers styles信息
+     *
      * @param type
      * @param request
      * @return
      * @throws Exception
      */
-    Object parseRequestKVP(Class type, Request request) throws Exception {
+    Object parseRequestKVP(Class type, Request request) throws Exception
+    {
         KvpRequestReader kvpReader = findKvpRequestReader(type);
 
-        if (kvpReader != null) {
+        if (kvpReader != null)
+        {
             Object requestBean = kvpReader.createRequest();
 
-            if (requestBean != null) {
+            if (requestBean != null)
+            {
                 requestBean = kvpReader.read(requestBean, request.getKvp(), request.getRawKvp());
             }
 
@@ -1574,10 +1963,12 @@ public class Dispatcher extends AbstractController {
     }
 
     Object parseRequestXML(Object requestBean, BufferedReader input, Request request)
-            throws Exception {
+            throws Exception
+    {
         // check for an empty input stream
         // if (input.available() == 0) {
-        if (!input.ready()) {
+        if (!input.ready())
+        {
             return null;
         }
 
@@ -1597,11 +1988,14 @@ public class Dispatcher extends AbstractController {
         String version = null;
         String service = null;
 
-        for (int i = 0; i < parser.getAttributeCount(); i++) {
-            if ("version".equals(parser.getAttributeName(i))) {
+        for (int i = 0; i < parser.getAttributeCount(); i++)
+        {
+            if ("version".equals(parser.getAttributeName(i)))
+            {
                 version = parser.getAttributeValue(i);
             }
-            if ("service".equals(parser.getAttributeName(i))) {
+            if ("service".equals(parser.getAttributeName(i)))
+            {
                 service = parser.getAttributeValue(i);
             }
         }
@@ -1612,7 +2006,8 @@ public class Dispatcher extends AbstractController {
         input.reset();
 
         XmlRequestReader xmlReader = findXmlReader(namespace, element, service, version);
-        if (xmlReader == null) {
+        if (xmlReader == null)
+        {
             // no xml reader, just return object passed in
             return requestBean;
         }
@@ -1627,10 +2022,12 @@ public class Dispatcher extends AbstractController {
      * @param request {@link Request} object
      * @return a {@link Map} containing the parsed parameters.
      */
-    public static Map readOpContext(Request request) {
+    public static Map readOpContext(Request request)
+    {
 
         Map map = new HashMap();
-        if (request.getPath() != null) {
+        if (request.getPath() != null)
+        {
             map.put("service", request.getPath());
         }
 
@@ -1645,7 +2042,8 @@ public class Dispatcher extends AbstractController {
      * @return a {@link Map} containing the parsed parameters.
      * @throws Exception if there was an error reading the input.
      */
-    public static Map readOpPost(BufferedReader input) throws Exception {
+    public static Map readOpPost(BufferedReader input) throws Exception
+    {
         // create stream parser
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -1660,18 +2058,22 @@ public class Dispatcher extends AbstractController {
         map.put("request", parser.getName());
         map.put("namespace", parser.getNamespace());
 
-        for (int i = 0; i < parser.getAttributeCount(); i++) {
+        for (int i = 0; i < parser.getAttributeCount(); i++)
+        {
             String attName = parser.getAttributeName(i);
 
-            if ("service".equals(attName)) {
+            if ("service".equals(attName))
+            {
                 map.put("service", parser.getAttributeValue(i));
             }
 
-            if ("version".equals(parser.getAttributeName(i))) {
+            if ("version".equals(parser.getAttributeName(i)))
+            {
                 map.put("version", parser.getAttributeValue(i));
             }
 
-            if ("outputFormat".equals(attName)) {
+            if ("outputFormat".equals(attName))
+            {
                 map.put("outputFormat", parser.getAttributeValue(i));
             }
         }
@@ -1685,82 +2087,108 @@ public class Dispatcher extends AbstractController {
         return map;
     }
 
-    void exception(Throwable t, Service service, Request request) {
+    void exception(Throwable t, Service service, Request request)
+    {
         Throwable current = t;
         while (current != null
                 && !(current instanceof ClientStreamAbortedException)
                 && !isSecurityException(current)
-                && !(current instanceof HttpErrorCodeException)) {
+                && !(current instanceof HttpErrorCodeException))
+        {
             if (current instanceof SAXException) current = ((SAXException) current).getException();
             else current = current.getCause();
         }
-        if (current instanceof ClientStreamAbortedException) {
+        if (current instanceof ClientStreamAbortedException)
+        {
             logger.log(Level.FINER, "Client has closed stream", t);
             return;
         }
-        if (isSecurityException(current)) {
+        if (isSecurityException(current))
+        {
             throw (RuntimeException) current;
         }
 
-        if (current instanceof HttpErrorCodeException) {
+        if (current instanceof HttpErrorCodeException)
+        {
             HttpErrorCodeException ece = (HttpErrorCodeException) current;
             int errorCode = ece.getErrorCode();
-            if (errorCode < 199 || errorCode > 299) {
+            if (errorCode < 199 || errorCode > 299)
+            {
                 logger.log(Level.FINE, "", t);
-            } else {
+            }
+            else
+            {
                 logger.log(Level.FINER, "", t);
             }
 
             boolean isError = ece.getErrorCode() >= 400;
             HttpServletResponse rsp = request.getHttpResponse();
 
-            if (ece.getContentType() != null) {
+            if (ece.getContentType() != null)
+            {
                 rsp.setContentType(ece.getContentType());
             }
-            try {
-                if (isError) {
-                    if (ece.getMessage() != null) {
+            try
+            {
+                if (isError)
+                {
+                    if (ece.getMessage() != null)
+                    {
                         rsp.sendError(ece.getErrorCode(), ece.getMessage());
-                    } else {
+                    }
+                    else
+                    {
                         rsp.sendError(ece.getErrorCode());
                     }
-                } else {
+                }
+                else
+                {
                     rsp.setStatus(ece.getErrorCode());
-                    if (ece.getMessage() != null) {
+                    if (ece.getMessage() != null)
+                    {
                         rsp.getOutputStream().print(ece.getMessage());
                     }
                 }
-                if (!isError) {
+                if (!isError)
+                {
                     // gwc returns an HttpErrorCodeException for 304s
                     // we don't want to flag these as errors for upstream filters, ie the monitoring
                     // extension
                     t = null;
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 // means the resposne was already commited something
                 logger.log(Level.FINER, "", t);
             }
-        } else {
+        }
+        else
+        {
             logger.log(Level.SEVERE, "", t);
 
             // unwind the exception stack until we find one we know about
             Throwable cause = t;
-            while (cause != null) {
-                if (cause instanceof ServiceException) {
+            while (cause != null)
+            {
+                if (cause instanceof ServiceException)
+                {
                     break;
                 }
 
                 cause = cause.getCause();
             }
 
-            if (cause == null) {
+            if (cause == null)
+            {
                 // did not fine a "special" exception, create a service exception by default
                 cause = new ServiceException(t);
             }
 
             // at this point we're sure it'a service exception
             ServiceException se = (ServiceException) cause;
-            if (cause != t) {
+            if (cause != t)
+            {
                 // copy the message, code + locator, but set cause equal to root
                 se = new ServiceException(se.getMessage(), t, se.getCode(), se.getLocator());
             }
@@ -1771,17 +2199,21 @@ public class Dispatcher extends AbstractController {
         request.error = t;
     }
 
-    void handleServiceException(ServiceException se, Service service, Request request) {
+    void handleServiceException(ServiceException se, Service service, Request request)
+    {
         // find an exception handler
         ServiceExceptionHandler handler = null;
 
-        if (service != null) {
+        if (service != null)
+        {
             // look up the service exception handler
             Collection handlers = GeoServerExtensions.extensions(ServiceExceptionHandler.class);
-            for (Iterator h = handlers.iterator(); h.hasNext(); ) {
+            for (Iterator h = handlers.iterator(); h.hasNext(); )
+            {
                 ServiceExceptionHandler seh = (ServiceExceptionHandler) h.next();
 
-                if (seh.getServices().contains(service)) {
+                if (seh.getServices().contains(service))
+                {
                     // found one,
                     handler = seh;
 
@@ -1790,7 +2222,8 @@ public class Dispatcher extends AbstractController {
             }
         }
 
-        if (handler == null) {
+        if (handler == null)
+        {
             // none found, fall back on default
             handler = new OWS10ServiceExceptionHandler();
         }
@@ -1800,7 +2233,8 @@ public class Dispatcher extends AbstractController {
         // output XML
         if (request.isSOAP()
                 && (handler instanceof OWS10ServiceExceptionHandler
-                        || handler instanceof OWS11ServiceExceptionHandler)) {
+                || handler instanceof OWS11ServiceExceptionHandler))
+        {
             handler = new SOAPServiceExceptionHandler(handler);
         }
 
@@ -1808,10 +2242,14 @@ public class Dispatcher extends AbstractController {
         // avoid
         // proposing to save a file with the wrong extension that some OSs won't know how to open)
         HttpServletResponse httpResponse = request.getHttpResponse();
-        if (httpResponse.containsHeader(HttpHeaders.CONTENT_DISPOSITION)) {
-            try {
+        if (httpResponse.containsHeader(HttpHeaders.CONTENT_DISPOSITION))
+        {
+            try
+            {
                 httpResponse.setHeader(HttpHeaders.CONTENT_DISPOSITION, null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 // the spec is not clear about setting null, but reportedly works
                 // in Jetty, Tomcat, Glassfish... Not in your test harness though
                 logger.log(Level.FINE, "Failed to reset content disposition header", e);
@@ -1827,16 +2265,19 @@ public class Dispatcher extends AbstractController {
      * @param t Throwable
      * @return true if t is a security exception
      */
-    public static boolean isSecurityException(Throwable t) {
+    public static boolean isSecurityException(Throwable t)
+    {
         return t != null
                 && t.getClass().getPackage().getName().startsWith("org.springframework.security");
     }
 
-    public int getXMLPostRequestLogBufferSize() {
+    public int getXMLPostRequestLogBufferSize()
+    {
         return xmlPostRequestLogBufferSize;
     }
 
-    public void setXMLPostRequestLogBufferSize(int bufferSize) {
+    public void setXMLPostRequestLogBufferSize(int bufferSize)
+    {
         this.xmlPostRequestLogBufferSize = bufferSize;
     }
 }

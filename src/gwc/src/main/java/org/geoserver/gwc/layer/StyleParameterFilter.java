@@ -194,7 +194,10 @@ public class StyleParameterFilter extends ParameterFilter {
         availableStyles = new TreeSet<String>();
 
         for (StyleInfo style : layer.getStyles()) {
-            availableStyles.add(style.prefixedName());
+            if (style != null)
+            {
+                availableStyles.add(style.prefixedName());
+            }
         }
         if (layer.getDefaultStyle() != null) {
             defaultStyle = layer.getDefaultStyle().prefixedName();

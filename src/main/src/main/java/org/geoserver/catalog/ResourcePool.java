@@ -39,6 +39,8 @@ import java.util.logging.Logger;
 import javax.measure.Unit;
 import javax.measure.UnitConverter;
 import javax.measure.quantity.Length;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +55,8 @@ import org.geoserver.catalog.event.CatalogPostModifyEvent;
 import org.geoserver.catalog.event.CatalogRemoveEvent;
 import org.geoserver.catalog.impl.ModificationProxy;
 import org.geoserver.catalog.impl.StoreInfoImpl;
+import org.geoserver.catalog.rsmse.RsmseStyleInfo;
+import org.geoserver.catalog.rsmse.impl.RsmseStyleInfoImpl;
 import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.data.util.CoverageStoreUtils;
 import org.geoserver.data.util.CoverageUtils;
@@ -2027,6 +2031,16 @@ public class ResourcePool {
 
         return sld;
     }
+
+
+    public String getRsmseSldTxt(final RsmseStyleInfo info) throws IOException{
+        Resource rsmseStyle = dataDir().rsmseStyle(info);
+        File input = rsmseStyle.file();
+        String sldTxt = FileUtils.readFileToString(input,"UTF-8");
+        return sldTxt;
+    }
+
+
     /**
      * Returns the first {@link Style} in a style resource, caching the result. Any associated
      * images should also be unpacked onto the local machine. ResourcePool will watch the style for
@@ -2224,6 +2238,8 @@ public class ResourcePool {
         styleCache.clear();
         listeners.clear();
     }
+
+
 
     /**
      * Base class for all the resource caches, ensures type safety and provides an easier way to

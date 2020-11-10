@@ -38,7 +38,7 @@ create table collection (
   "eoDissemination" varchar,
   "eoAcquisitionStation" varchar
 );
--- index all (really, this is a search engine)
+-- index all (really, this is a styleSearchRequest engine)
 -- manually generated indexes
 create index "idx_collection_footprint" on collection using GIST("footprint");
 -- the following indexes have been generated calling
@@ -74,7 +74,7 @@ create table collection_layer (
   "defaultLayer" boolean
 );
 
--- the iso metadata storage (large text, not used for search, thus separate table)
+-- the iso metadata storage (large text, not used for styleSearchRequest, thus separate table)
 create table collection_metadata (
   "mid" int primary key references collection("id"),
   "metadata" text
@@ -138,7 +138,7 @@ create table product (
   "atmAlgorithmVersion" varchar[]
 );
 
--- index all (really, this is a search engine)
+-- index all (really, this is a styleSearchRequest engine)
 -- manually generated indexes
 create index "idx_product_footprint" on product using GIST("footprint");
 -- the following indexes have been generated adding
@@ -187,15 +187,15 @@ create index "idx_product_footprint" on product using GIST("footprint");
  CREATE INDEX "idx_product_atmSpeciesError" on product using GIN("atmSpeciesError");
  CREATE INDEX "idx_product_atmAlgorithmName" on product using GIN("atmAlgorithmName");
  CREATE INDEX "idx_product_atmAlgorithmVersion" on product using GIN("atmAlgorithmVersion");
- 
 
- -- the eo metadata storage (large files, not used for search, thus separate table)
+
+ -- the eo metadata storage (large files, not used for styleSearchRequest, thus separate table)
 create table product_metadata (
   "mid" int primary key references product("id") on delete cascade,
   "metadata" text
 );
 
--- the eo thumbs storage (small binary files, not used for search, thus separate table)
+-- the eo thumbs storage (small binary files, not used for styleSearchRequest, thus separate table)
 create table product_thumb (
 	"tid" int primary key references product("id") on delete cascade,
 	"thumb" bytea
@@ -221,7 +221,7 @@ create table product_ogclink (
   "code" varchar,
   "type" varchar,
   "href" varchar
-); 
+);
 
 -- the granules table (might be abstract, and we can use partitioning)
 create table granule (

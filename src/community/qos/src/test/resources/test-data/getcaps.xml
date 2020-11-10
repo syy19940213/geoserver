@@ -20,7 +20,7 @@ with it. The document tree is shown below.
 		<ows:Title>My GeoServer WFS</ows:Title>
 		<ows:Abstract>
 This is a description of your Web Feature Server.
- 
+
  The GeoServer is a full transactional Web Feature Server, you may wish to limit
  GeoServer to a Basic service level to prevent modificaiton of your geographic
  data.
@@ -3246,7 +3246,7 @@ urn:ogc:def:queryLanguage:OGC-WFS::WFSQueryExpression
 					<fes:Argument name="string">
 						<fes:Type>xs:string</fes:Type>
 					</fes:Argument>
-					<fes:Argument name="search">
+					<fes:Argument name="styleSearchRequest">
 						<fes:Type>xs:string</fes:Type>
 					</fes:Argument>
 					<fes:Argument name="replace">

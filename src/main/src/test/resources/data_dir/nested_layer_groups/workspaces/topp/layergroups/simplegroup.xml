@@ -6,13 +6,13 @@
     <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffd</id>
   </workspace>
   <publishables>
-    
+
     <published type="layer">
       <id>LayerInfoImpl-2bc80f29:12cef718474:-7fc9</id>
     </published>
   </publishables>
   <styles>
-    <style/>    
+    <style/>
   </styles>
   <bounds>
     <minx>1661829.656</minx>
@@ -21,19 +21,19 @@
     <maxy>4874173.55649313</maxy>
     <crs class="projected">EPSG:3003</crs>
   </bounds>
-  <metadataLinks>   
+  <metadataLinks>
     <metadataLink>
       <id>1</id>
       <type>text/html</type>
       <metadataType>FGDC</metadataType>
       <content>http://my/metadata/link/1</content>
-    </metadataLink>    
+    </metadataLink>
     <metadataLink>
       <id>2</id>
       <type>text/html</type>
       <metadataType>FGDC</metadataType>
       <content>http://my/metadata/link/2</content>
-    </metadataLink>    
+    </metadataLink>
   </metadataLinks>
   <attribution>
     <logoWidth>101</logoWidth>

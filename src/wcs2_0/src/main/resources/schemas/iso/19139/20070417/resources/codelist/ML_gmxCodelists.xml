@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 CORRECTIONS referenced 2012-07-13 #01
 AUTHOR: XML Maintenance group - Nicolas Lesage
 PURPOSE: Use of absolute path in xsi:schemaLocation
@@ -184,13 +184,13 @@ DESCRIPTION:
 			</codeEntry>
 			<codeEntry>
 				<ML_CodeDefinition gml:id="CI_OnLineFunctionCode_search">
-					<gml:description>online search interface for seeking out information about the resource</gml:description>
-					<gml:identifier codeSpace="ISOTC211/19115">search</gml:identifier>
+					<gml:description>online styleSearchRequest interface for seeking out information about the resource</gml:description>
+					<gml:identifier codeSpace="ISOTC211/19115">styleSearchRequest</gml:identifier>
 					<gml:name>Search</gml:name>
 					<alternativeExpression>
 						<CodeAlternativeExpression gml:id="CI_OnLineFunctionCode_search_fr" codeSpace="fra">
 							<gml:description>interface de recherche d'information sur la ressource</gml:description>
-							<gml:identifier codeSpace="ISOTC211/19115">search</gml:identifier>
+							<gml:identifier codeSpace="ISOTC211/19115">styleSearchRequest</gml:identifier>
 							<gml:name>Moteur de recherche</gml:name>
 							<locale xlink:href="#xpointer(//*[@id='fra'])"/>
 						</CodeAlternativeExpression>

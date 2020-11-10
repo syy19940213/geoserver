@@ -5,7 +5,7 @@ xmlns:sld="http://www.opengis.net/sld"
 xmlns:ogc="http://www.opengis.net/ogc"
 xmlns:gml="http://www.opengis.net/gml"
 xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
-  
+
   <sld:UserLayer>
     <sld:LayerFeatureConstraints>
       <sld:FeatureTypeConstraint/>
@@ -86,7 +86,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
             <sld:VendorOption name="autoWrap">100</sld:VendorOption>
           </sld:TextSymbolizer>
         </sld:Rule>
-        
+
         <sld:Rule>
           <sld:Name>mountains</sld:Name>
           <ogc:Filter>
@@ -153,7 +153,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
             <sld:VendorOption name="autoWrap">100</sld:VendorOption>
           </sld:TextSymbolizer>
         </sld:Rule>
-        
+
         <sld:Rule>
           <sld:Name>jails</sld:Name>
           <ogc:Filter>
@@ -228,7 +228,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
             <sld:VendorOption name="autoWrap">100</sld:VendorOption>
           </sld:TextSymbolizer>
         </sld:Rule>
-        
+
         <sld:Rule>
           <sld:Name>governement</sld:Name>
           <ogc:Filter>
@@ -295,7 +295,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
             <sld:VendorOption name="autoWrap">100</sld:VendorOption>
           </sld:TextSymbolizer>
         </sld:Rule>
-        
+
         <sld:Rule>
           <sld:Name>airport</sld:Name>
           <ogc:Filter>
@@ -354,7 +354,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
             <sld:VendorOption name="autoWrap">100</sld:VendorOption>
           </sld:TextSymbolizer>
         </sld:Rule>
-        
+
         <sld:Rule>
           <sld:Name>school</sld:Name>
           <ogc:Filter>
@@ -421,7 +421,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
             <sld:VendorOption name="autoWrap">100</sld:VendorOption>
           </sld:TextSymbolizer>
         </sld:Rule>
-        
+
         <sld:Rule>
           <sld:Name>cemetery</sld:Name>
           <ogc:Filter>
@@ -480,7 +480,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
             <sld:VendorOption name="autoWrap">100</sld:VendorOption>
           </sld:TextSymbolizer>
         </sld:Rule>
-        
+
         <sld:Rule>
           <sld:Name>gate</sld:Name>
           <ogc:Filter>
@@ -547,7 +547,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0.0">
             <sld:VendorOption name="autoWrap">100</sld:VendorOption>
           </sld:TextSymbolizer>
         </sld:Rule>
-        
+
       </sld:FeatureTypeStyle>
     </sld:UserStyle>
   </sld:UserLayer>

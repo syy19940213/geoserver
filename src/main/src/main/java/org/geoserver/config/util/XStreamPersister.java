@@ -5,6 +5,7 @@
  */
 package org.geoserver.config.util;
 
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.thoughtworks.xstream.XStream;
@@ -58,7 +59,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 import org.codehaus.jettison.util.FastStack;
 import org.geoserver.catalog.AttributeTypeInfo;
@@ -121,6 +121,8 @@ import org.geoserver.catalog.impl.WMSStoreInfoImpl;
 import org.geoserver.catalog.impl.WMTSLayerInfoImpl;
 import org.geoserver.catalog.impl.WMTSStoreInfoImpl;
 import org.geoserver.catalog.impl.WorkspaceInfoImpl;
+import org.geoserver.catalog.rsmse.*;
+import org.geoserver.catalog.rsmse.impl.*;
 import org.geoserver.config.ContactInfo;
 import org.geoserver.config.CoverageAccessInfo;
 import org.geoserver.config.GeoServer;
@@ -346,6 +348,16 @@ public class XStreamPersister {
         xs.alias("AuthorityURL", AuthorityURLInfo.class);
         xs.alias("Identifier", LayerIdentifierInfo.class);
 
+        xs.alias("rsmseStyle", RsmseStyleInfo.class);
+        xs.alias("rsmseSource", RsmseSourceInfo.class);
+        xs.alias("rsmseData", RsmseDataInfo.class);
+        xs.alias("rsmseSymbol", RsmseSymbolInfo.class);
+        xs.alias("rsmseMapConfig", RsmseMapConfig.class);
+
+
+        xs.alias("primitives", JSONArray.class);
+
+
         // GeoServerInfo
         xs.omitField(impl(GeoServerInfo.class), "clientProperties");
         xs.omitField(impl(GeoServerInfo.class), "geoServer");
@@ -409,6 +421,17 @@ public class XStreamPersister {
         xs.registerLocalConverter(
                 impl(StyleInfo.class), "workspace", new ReferenceConverter(WorkspaceInfo.class));
         xs.registerLocalConverter(impl(StyleInfo.class), "metadata", new MetadataMapConverter());
+
+
+
+        // RemseSourceInfo
+        xs.omitField(impl(RsmseSourceInfo.class), "catalog");
+        xs.registerLocalConverter(
+                impl(RsmseSourceInfo.class), "rsmseData", new ReferenceConverter(RsmseDataInfo.class));
+
+
+        // Symbol
+//        xs.registerLocalConverter(impl(RsmseSymbolInfo.class),"primitives",new ReferenceConverter(JSONArray.class));
 
         // ResourceInfo
         xs.omitField(impl(ResourceInfo.class), "catalog");
@@ -544,10 +567,13 @@ public class XStreamPersister {
         xs.allowTypeHierarchy(Info.class);
         xs.allowTypeHierarchy(Multimap.class);
         xs.allowTypeHierarchy(JAIInfo.class);
+
         xs.allowTypes(new Class[] {DynamicProxyMapper.DynamicProxy.class});
         xs.allowTypes(new String[] {"java.util.Collections$SingletonList"});
         xs.allowTypesByWildcard(new String[] {"org.geoserver.catalog.**"});
         xs.allowTypesByWildcard(new String[] {"org.geoserver.security.**"});
+        xs.allowTypesByWildcard(new String[] {"com.alibaba.fastjson.**"});
+
     }
 
     /**
@@ -674,6 +700,20 @@ public class XStreamPersister {
         return obj;
     }
 
+
+    public <T> T load(String in, Class<T> clazz) throws IOException {
+        T obj = clazz.cast(xs.fromXML(in));
+
+        // call resolve() to ensure that any references created during loading
+        // get resolved to actual objects, for instance for links from datastores
+        // to workspaces
+        if (obj instanceof CatalogImpl) {
+            ((CatalogImpl) obj).resolve();
+        }
+
+        return obj;
+    }
+
     /**
      * Builds a converter that will marshal/unmarshal the target class by reference, that is, by
      * storing the object id as opposed to fully serializing it
@@ -722,6 +762,13 @@ public class XStreamPersister {
         xs.addDefaultImplementation(LayerGroupInfoImpl.class, LayerGroupInfo.class);
         xs.addDefaultImplementation(LayerIdentifier.class, LayerIdentifierInfo.class);
         xs.addDefaultImplementation(AuthorityURL.class, AuthorityURLInfo.class);
+
+
+        xs.addDefaultImplementation(RsmseStyleInfoImpl.class, RsmseStyleInfo.class);
+        xs.addDefaultImplementation(RsmseSourceInfoImpl.class,RsmseSourceInfo.class);
+        xs.addDefaultImplementation(RsmseDataInfoImpl.class,RsmseDataInfo.class);
+        xs.addDefaultImplementation(RsmseSymbolInfoImpl.class,RsmseSymbolInfo.class);
+        xs.addDefaultImplementation(RsmseMapConfigImpl.class,RsmseMapConfig.class);
 
         // supporting objects
         xs.addDefaultImplementation(GridGeometry2D.class, GridGeometry.class);

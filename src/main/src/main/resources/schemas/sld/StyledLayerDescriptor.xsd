@@ -41,7 +41,7 @@
   <xsd:element name="Name" type="xsd:string"/>
   <xsd:element name="Title" type="sld:InternationalStringType"/>
   <xsd:element name="Abstract" type="sld:InternationalStringType"/>
-  
+
   <xsd:complexType name="InternationalStringType" mixed="true">
     <xsd:annotation>
       <xsd:documentation>
@@ -50,11 +50,11 @@
         model is used with localized value elements and default text value.
       </xsd:documentation>
     </xsd:annotation>
-    <xsd:sequence minOccurs="0" maxOccurs="unbounded">        
+    <xsd:sequence minOccurs="0" maxOccurs="unbounded">
       <xsd:element ref="sld:Localized"/>
     </xsd:sequence>
   </xsd:complexType>
-  
+
   <xsd:element name="Localized">
     <xsd:complexType>
       <xsd:simpleContent>
@@ -62,7 +62,7 @@
              <xsd:attribute name="lang" type="xsd:string" />
           </xsd:extension>
       </xsd:simpleContent>
-    </xsd:complexType>    
+    </xsd:complexType>
   </xsd:element>
 
 <!-- *********************************************************************** -->
@@ -113,22 +113,22 @@
     <xsd:complexType>
       <xsd:sequence>
         <xsd:element ref="sld:Name" minOccurs="0"/>
-        
+
         <xsd:choice minOccurs="0">
 	        <xsd:element ref="sld:InlineFeature"/>
 	        <xsd:element ref="sld:RemoteOWS" minOccurs="0"/>
 	</xsd:choice>
-	
+
         <xsd:element ref="sld:LayerFeatureConstraints"/>
         <xsd:element ref="sld:UserStyle" maxOccurs="unbounded"/>
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name="InlineFeature">
     <xsd:complexType>
-      <xsd:sequence> 
-        <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>     
+      <xsd:sequence>
+        <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
@@ -137,7 +137,7 @@
   <xsd:element name="RemoteOWS">
     <xsd:annotation>
       <xsd:documentation>
-        A RemoteOWS gives a reference to a remote WFS/WCS/other-OWS server. 
+        A RemoteOWS gives a reference to a remote WFS/WCS/other-OWS server.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
@@ -207,7 +207,7 @@
   <xsd:element name="Extent">
     <xsd:annotation>
       <xsd:documentation>
-        An Extent gives feature/coverage/raster/matrix dimension extent. 
+        An Extent gives feature/coverage/raster/matrix dimension extent.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
@@ -272,7 +272,7 @@
   <xsd:element name="Transformation">
     <xsd:annotation>
       <xsd:documentation>
-        A Transformation specifies a Rendering Transformation 
+        A Transformation specifies a Rendering Transformation
         to be applied to the input data before styling.
       </xsd:documentation>
     </xsd:annotation>
@@ -282,7 +282,7 @@
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name="Rule">
     <xsd:annotation>
       <xsd:documentation>
@@ -585,7 +585,7 @@
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name="WellKnownName">
     <xsd:annotation>
       <xsd:documentation>
@@ -598,7 +598,7 @@
   	  </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
-  
+
 <!-- *********************************************************************** -->
   <xsd:annotation>
     <xsd:documentation>
@@ -623,12 +623,12 @@
             <xsd:element ref="sld:LabelPlacement" minOccurs="0"/>
             <xsd:element ref="sld:Halo" minOccurs="0"/>
             <xsd:element ref="sld:Fill" minOccurs="0"/>
-            
+
             <!-- GeoServer specific extensions, these are not part of the SLD 1.0 standard -->
             <xsd:element ref="sld:Graphic" minOccurs="0"/>
             <xsd:element ref="sld:Priority" minOccurs="0"/>
-            <xsd:element ref="sld:VendorOption" minOccurs="0" maxOccurs="unbounded" />                 
-                 
+            <xsd:element ref="sld:VendorOption" minOccurs="0" maxOccurs="unbounded" />
+
 
           </xsd:sequence>
         </xsd:extension>
@@ -647,11 +647,11 @@
   </xsd:complexType>
 </xsd:element>
 
-  
-  
+
+
    <xsd:element name="Priority" type="sld:ParameterValueType">
    </xsd:element>
-  
+
 
   <xsd:element name="Label" type="sld:ParameterValueType">
     <xsd:annotation>

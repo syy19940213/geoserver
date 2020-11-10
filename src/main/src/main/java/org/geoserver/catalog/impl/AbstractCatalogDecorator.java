@@ -28,6 +28,9 @@ import org.geoserver.catalog.StyleInfo;
 import org.geoserver.catalog.ValidationResult;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.catalog.event.CatalogListener;
+import org.geoserver.catalog.rsmse.*;
+import org.geoserver.catalog.rsmse.impl.RsmseMapConfigImpl;
+import org.geoserver.catalog.rsmse.impl.RsmseSymbolInfoImpl;
 import org.geoserver.catalog.util.CloseableIterator;
 import org.geoserver.platform.GeoServerResourceLoader;
 import org.geotools.util.decorate.AbstractDecorator;
@@ -681,5 +684,161 @@ public class AbstractCatalogDecorator extends AbstractDecorator<Catalog> impleme
     @Override
     public CatalogCapabilities getCatalogCapabilities() {
         return delegate.getCatalogCapabilities();
+    }
+
+    @Override
+    public void add(RsmseStyleInfo rsmseStyleInfo)
+    {
+        delegate.add(rsmseStyleInfo);
+    }
+
+    @Override
+    public void remove(RsmseStyleInfo rsmseStyleInfo)
+    {
+        delegate.remove(rsmseStyleInfo);
+    }
+
+    @Override
+    public List<RsmseStyleInfo> getRsmseStyleByName(String name, Integer page, Integer pageSize)
+    {
+        return delegate.getRsmseStyleByName(name,page,pageSize);
+    }
+
+    @Override
+    public RsmseStyleInfo getRsmseStyleByName(String name)
+    {
+        return delegate.getRsmseStyleByName(name);
+    }
+
+    @Override
+    public RsmseStyleInfo getRsmseStyleById(String id)
+    {
+        return delegate.getRsmseStyleById(id);
+    }
+
+    @Override
+    public void add(RsmseSourceInfo rsmseSourceInfo)
+    {
+        delegate.add(rsmseSourceInfo);
+    }
+
+    @Override
+    public List<RsmseSourceInfo> getRsmseSourceByName(String name, Integer page, Integer pageSize)
+    {
+        return delegate.getRsmseSourceByName(name,page,pageSize);
+    }
+
+    @Override
+    public RsmseSourceInfo getRsmseSourceById(String id)
+    {
+        return delegate.getRsmseSourceById(id);
+    }
+
+    @Override
+    public void remove(RsmseSourceInfo rsmseSourceInfo)
+    {
+        delegate.remove(rsmseSourceInfo);
+    }
+
+    @Override
+    public RsmseSymbolInfo getRsmseSymbolById(String id)
+    {
+        return delegate.getRsmseSymbolById(id);
+    }
+
+    @Override
+    public List<RsmseSymbolInfo> getRsmseSymbolByName(String name, Integer page, Integer pageSize)
+    {
+        return delegate.getRsmseSymbolByName(name,page,pageSize);
+    }
+
+    @Override
+    public List<RsmseSymbolInfo> getRsmseSymbolByName(Integer type, String name, Integer page, Integer pageSize)
+    {
+        return delegate.getRsmseSymbolByName(type,name,page,pageSize);
+    }
+
+    @Override
+    public void remove(RsmseSymbolInfo rsmseSymbolInfo)
+    {
+        delegate.remove(rsmseSymbolInfo);
+    }
+
+    @Override
+    public RsmseSourceInfo getRsmseSourceByName(String name)
+    {
+        return delegate.getRsmseSourceByName(name);
+    }
+
+    @Override
+    public RsmseSymbolInfo getRsmseSymbolByName(String name)
+    {
+        return delegate.getRsmseSymbolByName(name);
+    }
+
+    @Override
+    public RsmseMapConfig getRsmseMapConfigByName(String name)
+    {
+        return delegate.getRsmseMapConfigByName(name);
+    }
+
+    @Override
+    public List<RsmseMapConfig> getRsmseMapConfigByName(String name, Integer page, Integer pageSize)
+    {
+        return delegate.getRsmseMapConfigByName(name,page,pageSize);
+    }
+
+    @Override
+    public RsmseMapConfig getRsmseMapConfigById(String id)
+    {
+        return delegate.getRsmseMapConfigById(id);
+    }
+
+    @Override
+    public void add(RsmseMapConfig rsmseMapConfig)
+    {
+        delegate.add(rsmseMapConfig);
+    }
+
+    @Override
+    public void remove(RsmseMapConfig rsmseMapConfig)
+    {
+        delegate.remove(rsmseMapConfig);
+    }
+
+    @Override
+    public RsmseTileRuleInfo getRsmseTileRuleByName(String name)
+    {
+        return delegate.getRsmseTileRuleByName(name);
+    }
+
+    @Override
+    public RsmseTileRuleInfo getRsmseTileRuleById(String id)
+    {
+        return delegate.getRsmseTileRuleById(id);
+    }
+
+    @Override
+    public void add(RsmseTileRuleInfo rsmseTileRuleInfo)
+    {
+        delegate.add(rsmseTileRuleInfo);
+    }
+
+    @Override
+    public void remove(RsmseTileRuleInfo rsmseTileRuleInfo)
+    {
+        delegate.remove(rsmseTileRuleInfo);
+    }
+
+    @Override
+    public List<RsmseTileRuleInfo> getRsmseTileRuleByName(String name, Integer page, Integer pageSize)
+    {
+        return delegate.getRsmseTileRuleByName(name,page,pageSize);
+    }
+
+    @Override
+    public void add(RsmseSymbolInfo rsmseSymbolInfo)
+    {
+        delegate.add(rsmseSymbolInfo);
     }
 }

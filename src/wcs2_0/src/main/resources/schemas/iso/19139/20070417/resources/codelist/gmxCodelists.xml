@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 CORRECTIONS referenced 2012-07-13 #01
 AUTHOR: XML Maintenance group - Nicolas Lesage
 PURPOSE: Use of absolute path in xsi:schemaLocation
@@ -19,8 +19,8 @@ has been replaced by:
 
 CORRECTIONS referenced by 2008-09-11 #NN
 AUTHOR : IGN (France) contact: nicolas.lesage@ign.fr
-PURPOSE : Correction of 3 typographical errors 
-DESCRIPTION : 
+PURPOSE : Correction of 3 typographical errors
+DESCRIPTION :
 #01: 'unknwon' replaced by 'unknown'
 #02: 'MD_MaintenanceFrequencyCode_quartely' replaced by 'MD_MaintenanceFrequencyCode_quarterly'
 #03: 'quartely' replaced by 'quarterly'
@@ -102,8 +102,8 @@ DESCRIPTION :
 			</codeEntry>
 			<codeEntry>
 				<CodeDefinition gml:id="CI_OnLineFunctionCode_search">
-					<gml:description>online search interface for seeking out information about the resource</gml:description>
-					<gml:identifier codeSpace="ISOTC211/19115">search</gml:identifier>
+					<gml:description>online styleSearchRequest interface for seeking out information about the resource</gml:description>
+					<gml:identifier codeSpace="ISOTC211/19115">styleSearchRequest</gml:identifier>
 				</CodeDefinition>
 			</codeEntry>
 		</CodeListDictionary>
@@ -365,7 +365,7 @@ DESCRIPTION :
 			</codeEntry>
 			<codeEntry>
 				<CodeDefinition gml:id="DS_InitiativeTypeCode_investigation">
-					<gml:description>search or systematic inquiry</gml:description>
+					<gml:description>styleSearchRequest or systematic inquiry</gml:description>
 					<gml:identifier codeSpace="ISOTC211/19115">investigation</gml:identifier>
 				</CodeDefinition>
 			</codeEntry>
@@ -1562,7 +1562,7 @@ DESCRIPTION :
 	<!--=== MD_TopicCategoryCode ===-->
 	<codelistItem>
 		<CodeListDictionary gml:id="MD_TopicCategoryCode">
-			<gml:description>high-level geographic data thematic classification to assist in the grouping and search of available geographic data sets. Can be used to group keywords as well. Listed examples are not exhaustive.</gml:description>
+			<gml:description>high-level geographic data thematic classification to assist in the grouping and styleSearchRequest of available geographic data sets. Can be used to group keywords as well. Listed examples are not exhaustive.</gml:description>
 			<gml:identifier codeSpace="ISOTC211/19115">MD_TopicCategoryCode</gml:identifier>
 			<codeEntry>
 				<CodeDefinition gml:id="MD_TopicCategoryCode_farming">

@@ -31,7 +31,7 @@
                   <Size>16</Size>
                 </Graphic>
               </GraphicFill>
-             </Fill>     
+             </Fill>
           </PolygonSymbolizer>
         </Rule>
         <Rule>
@@ -60,7 +60,7 @@
                   <Size>8</Size>
                 </Graphic>
               </GraphicFill>
-             </Fill>     
+             </Fill>
           </PolygonSymbolizer>
         </Rule>
         <Rule>
@@ -84,7 +84,7 @@
                   </Mark>
                   <Size>4</Size>
                 </Graphic>
-              </GraphicFill>   
+              </GraphicFill>
               </Fill>
           </PolygonSymbolizer>
         </Rule>

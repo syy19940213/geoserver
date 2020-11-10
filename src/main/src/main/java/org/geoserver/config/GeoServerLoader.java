@@ -36,6 +36,10 @@ import org.geoserver.catalog.WMTSStoreInfo;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.catalog.event.CatalogListener;
 import org.geoserver.catalog.impl.CatalogImpl;
+import org.geoserver.catalog.rsmse.RsmseMapConfig;
+import org.geoserver.catalog.rsmse.RsmseSourceInfo;
+import org.geoserver.catalog.rsmse.RsmseStyleInfo;
+import org.geoserver.catalog.rsmse.RsmseSymbolInfo;
 import org.geoserver.catalog.util.LegacyCatalogImporter;
 import org.geoserver.catalog.util.LegacyCatalogReader;
 import org.geoserver.catalog.util.LegacyFeatureTypeInfoReader;
@@ -460,6 +464,16 @@ public abstract class GeoServerLoader {
         // global styles
         loadStyles(resourceLoader.get("styles"), catalog, xp);
 
+
+        loadRsmseStyles(resourceLoader.get("rsmseStyle"), catalog, xp);
+
+        loadRsmseSource(resourceLoader.get("rsmseSource"), catalog, xp);
+
+        loadRsmseSymbol(resourceLoader.get("rsmseSymbol"), catalog, xp);
+
+        loadRsmseMapConfig(resourceLoader.get("rsmseMapConfig"), catalog, xp);
+
+
         // workspaces, stores, and resources
         Resource workspaces = resourceLoader.get("workspaces");
         if (Resources.exists(workspaces)) {
@@ -628,6 +642,89 @@ public abstract class GeoServerLoader {
             catalog.setExtendedValidation(true);
         }
         return catalog;
+    }
+
+    void loadRsmseStyles(Resource styles, Catalog catalog, XStreamPersister xp) throws IOException {
+        Filter<Resource> styleFilter =
+                r -> XML_FILTER.accept(r) && !Resources.exists(styles.get(r.name() + ".xml"));
+        try (AsynchResourceIterator<byte[]> it =
+                     new AsynchResourceIterator<>(styles, styleFilter, r -> r.getContents())) {
+            while (it.hasNext()) {
+                try {
+                    RsmseStyleInfo s = depersist(xp, it.next(), RsmseStyleInfo.class);
+                    catalog.add(s);
+
+                    if (LOGGER.isLoggable(Level.INFO)) {
+                        LOGGER.info("Loaded rsmse style '" + s.getName() + "'");
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Failed to load style", e);
+                }
+            }
+        }
+    }
+
+    void loadRsmseSource(Resource styles, Catalog catalog, XStreamPersister xp) throws IOException {
+        Filter<Resource> styleFilter =
+                r -> XML_FILTER.accept(r) && !Resources.exists(styles.get(r.name() + ".xml"));
+        try (AsynchResourceIterator<byte[]> it =
+                     new AsynchResourceIterator<>(styles, styleFilter, r -> r.getContents())) {
+            while (it.hasNext()) {
+                try {
+                    RsmseSourceInfo s = depersist(xp, it.next(), RsmseSourceInfo.class);
+                    catalog.add(s);
+
+                    if (LOGGER.isLoggable(Level.INFO)) {
+                        LOGGER.info("Loaded rsmse souce '" + s.getName() + "'");
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Failed to load style", e);
+                }
+            }
+        }
+    }
+
+
+
+    void loadRsmseMapConfig(Resource styles, Catalog catalog, XStreamPersister xp) throws IOException {
+        Filter<Resource> styleFilter =
+                r -> XML_FILTER.accept(r) && !Resources.exists(styles.get(r.name() + ".xml"));
+        try (AsynchResourceIterator<byte[]> it =
+                     new AsynchResourceIterator<>(styles, styleFilter, r -> r.getContents())) {
+            while (it.hasNext()) {
+                try {
+                    RsmseMapConfig s = depersist(xp, it.next(), RsmseMapConfig.class);
+                    catalog.add(s);
+
+                    if (LOGGER.isLoggable(Level.INFO)) {
+                        LOGGER.info("Loaded rsmse souce '" + s.getName() + "'");
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Failed to load style", e);
+                }
+            }
+        }
+    }
+
+
+    void loadRsmseSymbol(Resource styles, Catalog catalog, XStreamPersister xp) throws IOException {
+        Filter<Resource> styleFilter =
+                r -> XML_FILTER.accept(r) && !Resources.exists(styles.get(r.name() + ".xml"));
+        try (AsynchResourceIterator<byte[]> it =
+                     new AsynchResourceIterator<>(styles, styleFilter, r -> r.getContents())) {
+            while (it.hasNext()) {
+                try {
+                    RsmseSymbolInfo s = depersist(xp, it.next(), RsmseSymbolInfo.class);
+                    catalog.add(s);
+
+                    if (LOGGER.isLoggable(Level.INFO)) {
+                        LOGGER.info("Loaded rsmse souce '" + s.getName() + "'");
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Failed to load style", e);
+                }
+            }
+        }
     }
 
     private void loadWmsStore(

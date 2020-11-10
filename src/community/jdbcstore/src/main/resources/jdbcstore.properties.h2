@@ -23,7 +23,7 @@ password=
 # connection pooling/management parameters
 #
 
-# minimum connections in pool  
+# minimum connections in pool
 pool.minIdle=4
 
 # maximum connections in pool
@@ -32,7 +32,7 @@ pool.maxActive=10
 # whether to pool prepared statements
 pool.poolPreparedStatements=true
 
-# size of prepared statement cache, only used if pool.poolPreparedStatements = true 
+# size of prepared statement cache, only used if pool.poolPreparedStatements = true
 pool.maxOpenPreparedStatements=50
 
 # whether to validate connections when obtaining from the pool

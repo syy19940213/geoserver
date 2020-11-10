@@ -107,6 +107,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.geoway.rsmse</groupId>
+      <artifactId>rsmse-web</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.geoserver</groupId>
       <artifactId>gs-kml</artifactId>
       <version>${project.version}</version>
@@ -1329,7 +1334,7 @@
         </dependency>
       </dependencies>
     </profile>
-    
+
    <profile>
       <id>geogig</id>
       <dependencies>
@@ -1624,7 +1629,7 @@
           <version>${project.version}</version>
         </dependency>
       </dependencies>
-    </profile>    
+    </profile>
     <profile>
       <id>taskmanager</id>
       <dependencies>
@@ -1677,7 +1682,7 @@
               <groupId>org.geotools</groupId>
               <artifactId>gt-app-schema</artifactId>
             </exclusion>
-          </exclusions> 
+          </exclusions>
         </dependency>
       </dependencies>
     </profile>
@@ -1690,7 +1695,7 @@
           <version>${project.version}</version>
         </dependency>
       </dependencies>
-    </profile>    
+    </profile>
     <profile>
       <id>mapml</id>
       <dependencies>

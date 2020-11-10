@@ -16,7 +16,7 @@
             <ogc:Function name="parameter">
               <ogc:Literal>data</ogc:Literal>
             </ogc:Function>
-          </ogc:Function> 
+          </ogc:Function>
         </Transformation>
         <Rule>
           <MinScaleDenominator>10000</MinScaleDenominator>

@@ -22,7 +22,7 @@
            <li><b>Revision</b>: ${model.dates.revision!"N/A"}</li>
            <li><b>Valid till</b>: ${model.dates.validTill!"N/A"}</li>
            <li><b>Received on</b>: ${model.dates.receivedOn!"N/A"}</li>
-         </ul>  
+         </ul>
        <#else>N/A
        </#if>
        </p>
@@ -37,7 +37,7 @@
          <ul>
            <#list model.layers as layer>
             <li>
-               ${layer.id}: ${layer.type}. 
+               ${layer.id}: ${layer.type}.
                <#if layer.sampleData??><a href="${layer.sampleData.href}">Sample data available</a>.</#if><br/>
                <#if layer.attributes?? && layer.attributes?size gt 0>
                   <p>Attributes used by the style:
@@ -47,9 +47,9 @@
                    </#list>
                    </ul>
                <#else>
-                 The style does not use any attribute from this layer.    
+                 The style does not use any attribute from this layer.
                </#if>
-            </li>   
+            </li>
           </#list>
          </ul>
       </p>

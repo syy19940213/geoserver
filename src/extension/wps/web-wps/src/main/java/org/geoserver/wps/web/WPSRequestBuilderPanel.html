@@ -8,8 +8,8 @@
           <ul>
             <li>
               <!--  <label for="name"><wicket:message key="name">process</wicket:message></label> -->
-              <select wicket:id="process"></select> 
-              <p wicket:id="descriptionContainer"> <span wicket:id="processDescription"/> 
+              <select wicket:id="process"></select>
+              <p wicket:id="descriptionContainer"> <span wicket:id="processDescription"/>
               	(<a href="#" wicket:id="describeProcess"><wicket:message key="describe">describe</wicket:message></a>)</p>
             </li>
           </ul>
@@ -63,15 +63,15 @@
         </fieldset>
       </li>
     </ul>
-    
+
     <div wicket:id="feedback"></div>
-  
+
     <div wicket:id="responseWindow"></div>
-  
+
     <wicket:fragment wicket:id="unknown">
       <span style="color:red">Unknown data type, can't provide an editor</span>
     </wicket:fragment>
-	
+
     <wicket:fragment wicket:id="literal">
 	  <input type="text" wicket:id="literalValue"></input>
     </wicket:fragment>
